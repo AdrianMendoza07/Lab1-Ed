@@ -22,3 +22,5 @@ class ProfileRepository:
         line = file.readline()
         file.close()
         return line
+    
+    

@@ -1,62 +1,85 @@
 import pygame
-import sys
 from Button import Button
 
 
-def runStartMenu(screen, events):
+def runStartMenu(screen, events, bg):
     
     WIDTH, HEIGHT = screen.get_size()
 
-    clock = pygame.time.Clock()
+    # Variables creadas solo al inicio
+    if not hasattr(runStartMenu, "initialized"):
+        runStartMenu.initialized = True
 
-    # Fuentes
-    title_font = pygame.font.Font(None, 80)
-    button_font = pygame.font.Font(None, 40)
+        # Fuentes 
+        runStartMenu.title_font = pygame.font.Font("assets/fonts/Orbitron-Bold.ttf", 80)
+        runStartMenu.button_font = pygame.font.Font("assets/fonts/Orbitron-Regular.ttf", 40)
 
-    # Botones rects
-    startButton = Button("Nuevo Juego", 200, 60, (WIDTH//2 , 220), button_font)
-    leaderboardButton = Button("Leaderboard", 200, 60, (WIDTH//2, 300), button_font)
-    settingsButton = Button("Opcion", 200, 60, (WIDTH//2, 380), button_font)
-    quitButton = Button("Salir", 200, 60, (WIDTH//2, 460), button_font)
+        # Botones
+        runStartMenu.startButton = Button("Nuevo Juego", 500, 60, (WIDTH//2 , 350), runStartMenu.button_font)
+        runStartMenu.usersButton = Button("Seleccion de Usuario", 500, 60, (WIDTH//2, 430), runStartMenu.button_font)
+        runStartMenu.leaderboardButton = Button("Leaderboard", 500, 60, (WIDTH//2, 510), runStartMenu.button_font)
+        runStartMenu.settingsButton = Button("Opcion", 500, 60, (WIDTH//2, 590), runStartMenu.button_font)
+        runStartMenu.quitButton = Button("Salir", 500, 60, (WIDTH//2, 670), runStartMenu.button_font)
+
+        # Estado
+        runStartMenu.action = None
+
+    # Para acceder a los botones mas rapido
+    startButton = runStartMenu.startButton
+    usersButton = runStartMenu.usersButton
+    leaderboardButton = runStartMenu.leaderboardButton
+    settingsButton = runStartMenu.settingsButton
+    quitButton = runStartMenu.quitButton
+
+    title_font = runStartMenu.title_font
 
     # Manejo de eventos
     for event in events:
         if event.type == pygame.QUIT:
             return 0
-        if settingsButton.isClicked(event):
-            return 2     
-        if quitButton.isClicked(event):
-            return 0
 
+        if settingsButton.handle_event(event):
+            runStartMenu.action = "settings"
 
-    # Posicion mouse
+        if quitButton.handle_event(event):
+            runStartMenu.action = "quit"
+
+    # Actualizar posicion y botones
     mouse_pos = pygame.mouse.get_pos()
 
-    # Limpa 
-    screen.fill((30, 30, 40))
-
-    # Title
-    title = title_font.render("Neon Runners", True, (210, 15, 240))
-    title_rect = title.get_rect(center=(WIDTH//2, 150))
-    screen.blit(title, title_rect)
-    
-    
-    
     startButton.update(mouse_pos)
+    usersButton.update(mouse_pos)
     leaderboardButton.update(mouse_pos)
     settingsButton.update(mouse_pos)
     quitButton.update(mouse_pos)
-    
+
+    # Seccion de draw
+    # Limpiar pantalla
+    screen.blit(bg, (0, 0))
+
+    # Titulo
+    title = title_font.render("Neon Runners", True, (255, 60, 200))
+    title_rect = title.get_rect(center=(WIDTH//2, 150))
+    for i in range(6, 0, -1):
+        glow = title_font.render("Neon Runners", True, (255, 20, 147))
+        screen.blit(glow, title_rect)
+
+    # Botones
     startButton.draw(screen)
+    usersButton.draw(screen)
     leaderboardButton.draw(screen)
     settingsButton.draw(screen)
     quitButton.draw(screen)
 
+    # Cambio de estado (para delay entre click y cambio)
+    if runStartMenu.action == "settings" and settingsButton.is_ready():
+        runStartMenu.action = None
+        return 2
 
-    # Actualizar 
+    if runStartMenu.action == "quit" and quitButton.is_ready():
+        return 0
+
     pygame.display.flip()
 
-    clock.tick(60)
-    
     return 1
 

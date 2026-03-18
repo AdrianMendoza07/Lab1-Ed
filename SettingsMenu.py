@@ -4,41 +4,51 @@ from Button import Button
 
 
 
-
-def runSettingsMenu(screen, events):
+def runSettingsMenu(screen, events, bg):
     WIDTH, HEIGHT = screen.get_size()
 
-    clock = pygame.time.Clock()
+    # Variables creadas solo al inicio
+    if not hasattr(runSettingsMenu, "initialized"):
+        runSettingsMenu.initialized = True
 
-    # Fuentes
-    title_font = pygame.font.Font(None, 80)
-    button_font = pygame.font.Font(None, 40)
+        # Fuentes 
+        runSettingsMenu.title_font = pygame.font.Font("assets/fonts/Orbitron-Bold.ttf", 80)
+        runSettingsMenu.button_font = pygame.font.Font("assets/fonts/Orbitron-Regular.ttf", 40)
 
-    backButton = Button("Back", 200, 60, (WIDTH-200, HEIGHT-100), button_font)
+        # Botones
+        runSettingsMenu.backButton = Button("Atras", 200, 60, (WIDTH-200 , HEIGHT-150), runSettingsMenu.button_font)
+        
+        # Estado
+        runSettingsMenu.action = None
+    
+    backButton = runSettingsMenu.backButton
     
     #Manejo de eventos
     for event in events:
         if event.type == pygame.QUIT:
             return 0
-        if backButton.isClicked(event):
-            return 1    
+        if backButton.handle_event(event):
+            runSettingsMenu.action = "back"    
             
     mouse_pos = pygame.mouse.get_pos()
 
     # Limpa 
-    screen.fill((30, 30, 40))
+    screen.blit(bg, (0, 0))
 
     # Title
-    title = title_font.render("Opciones", True, (210, 15, 240))
+    title = runSettingsMenu.title_font.render("Opciones", True, (210, 15, 240))
     title_rect = title.get_rect(center=(WIDTH//2, 150))
     screen.blit(title, title_rect)
     
     backButton.update(mouse_pos)       
+    
     backButton.draw(screen)
+    
+    if runSettingsMenu.action == "back" and backButton.is_ready():
+        runSettingsMenu.action = None
+        return 1
     
     # Actualizar 
     pygame.display.flip()
-
-    clock.tick(60)
     
     return 2 
