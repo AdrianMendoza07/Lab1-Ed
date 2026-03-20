@@ -25,7 +25,7 @@ class Button:
         self.currentColor = self.baseColor
         self.is_pressed = False
         self.press_time = 0
-        self.delay = 150  # ms
+        self.delay = 75  # ms
 
     # Manejo de clicks
     def handle_event(self, event):
@@ -45,7 +45,7 @@ class Button:
             else:
                 self.currentColor = self.baseColor
 
-    # Click termino
+    # Click termina
     def is_ready(self):
         if self.is_pressed:
             now = pygame.time.get_ticks()

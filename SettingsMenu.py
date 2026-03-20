@@ -18,10 +18,14 @@ def runSettingsMenu(screen, events, bg):
         # Botones
         runSettingsMenu.backButton = Button("Atras", 200, 60, (WIDTH-200 , HEIGHT-150), runSettingsMenu.button_font)
         
+
+        
         # Estado
         runSettingsMenu.action = None
     
     backButton = runSettingsMenu.backButton
+    
+    title_font = runSettingsMenu.title_font
     
     #Manejo de eventos
     for event in events:
@@ -36,9 +40,11 @@ def runSettingsMenu(screen, events, bg):
     screen.blit(bg, (0, 0))
 
     # Title
-    title = runSettingsMenu.title_font.render("Opciones", True, (210, 15, 240))
+    title = title_font.render("Opciones", True, (255, 60, 200))
     title_rect = title.get_rect(center=(WIDTH//2, 150))
-    screen.blit(title, title_rect)
+    for i in range(6, 0, -1):
+        glow = title_font.render("Opciones", True, (255, 20, 147))
+        screen.blit(glow, title_rect)
     
     backButton.update(mouse_pos)       
     

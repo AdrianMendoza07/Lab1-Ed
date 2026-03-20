@@ -23,4 +23,55 @@ class ProfileRepository:
         file.close()
         return line
     
+    def get_next_id(self):
+        try:
+            with open("data.log", "r") as file:
+                lines = file.readlines()
+
+                if not lines:
+                    return "player1"
+
+                last_line = lines[-1].strip()
+                last_id = last_line.split(",")[0]  # "playerX"
+
+                number = int(last_id.replace("player", ""))
+                return f"player{number + 1}"
+
+        except FileNotFoundError:
+            return "player1"
+    
+    
+    def get_all_profiles(self):
+        profiles = []
+
+        try:
+            with open("data.log", "r") as file:
+                for line in file:
+                    line = line.strip()
+
+                    
+                    if not line:
+                        continue
+
+                    parts = line.split(",")
+
+                    
+                    if len(parts) < 4:
+                        print(f"Skipping invalid line: {line}")
+                        continue
+
+                    profile = {
+                        "id": parts[0],
+                        "name": parts[1],
+                        "score": int(parts[2]),
+                        "max_score": int(parts[3])
+                    }
+
+                    profiles.append(profile)
+
+        except FileNotFoundError:
+            pass
+
+        return profiles
+        
     
