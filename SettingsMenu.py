@@ -26,8 +26,8 @@ def runSettingsMenu(screen, events, bg):
         runSettingsMenu.fullscreen = False
 
         # slider config
-        runSettingsMenu.slider_x = WIDTH//2 + 50
-        runSettingsMenu.slider_y = HEIGHT//2 - 60
+        runSettingsMenu.slider_x = WIDTH//2 + 20
+        runSettingsMenu.slider_y = HEIGHT//2 - 50
         runSettingsMenu.slider_width = 200
         runSettingsMenu.slider_height = 10
 
@@ -52,7 +52,7 @@ def runSettingsMenu(screen, events, bg):
     checkbox_y = runSettingsMenu.checkbox_y
     box_size = runSettingsMenu.box_size
     
-    #Manejo de eventos
+    # Manejo de eventos
     for event in events:
         if event.type == pygame.QUIT:
             return 0
@@ -84,7 +84,6 @@ def runSettingsMenu(screen, events, bg):
             if checkbox_x <= mx <= checkbox_x + box_size and checkbox_y <= my <= checkbox_y + box_size:
                 runSettingsMenu.fullscreen = not runSettingsMenu.fullscreen
 
-
         if backButton.handle_event(event):
             runSettingsMenu.action = "back" 
         if saveButton.handle_event(event):
@@ -92,10 +91,10 @@ def runSettingsMenu(screen, events, bg):
             
     mouse_pos = pygame.mouse.get_pos()
 
-    # Limpa 
+    # Fondo
     screen.blit(bg, (0, 0))
 
-    # panel
+    # Panel
     panel = pygame.Surface((600, 350))
     panel.set_alpha(120) 
     panel.fill((10, 10, 30)) 
@@ -107,20 +106,19 @@ def runSettingsMenu(screen, events, bg):
     title_rect = title.get_rect(center=(WIDTH//2, 150))
     screen.blit(title, title_rect)
 
-    # mostrar valores
+    # Textos
     font = runSettingsMenu.button_font
     color_txt = (0, 255, 200)
 
-    vol_surf = font.render(f"Volumen: {runSettingsMenu.volume}", True, (255,255,255))
+    vol_surf = font.render("Volumen:", True, (255,255,255))
     diff_surf = font.render(f"Dificultad: {runSettingsMenu.difficulty}", True, color_txt)
     full_surf = font.render("Pantalla Completa:", True, color_txt)
 
-    screen.blit(vol_surf, (WIDTH//2 - 200, HEIGHT//2 - 80))
-    screen.blit(diff_surf, (WIDTH//2 - 200, HEIGHT//2))
-    screen.blit(full_surf, (WIDTH//2 - 200, HEIGHT//2 + 80))
+    screen.blit(vol_surf, (WIDTH//2 - 250, HEIGHT//2 - 60))
+    screen.blit(diff_surf, (WIDTH//2 - 250, HEIGHT//2))
+    screen.blit(full_surf, (WIDTH//2 - 250, HEIGHT//2 + 80))
 
-
-    #  SLIDER
+    # SLIDER
     pygame.draw.rect(screen, (100, 100, 120), (slider_x, slider_y, slider_width, slider_height), border_radius=5)
 
     progress = (runSettingsMenu.volume / 100) * slider_width
@@ -129,6 +127,9 @@ def runSettingsMenu(screen, events, bg):
     handle_x = slider_x + progress
     pygame.draw.circle(screen, (200, 255, 255), (int(handle_x), slider_y + slider_height//2), 8)
 
+    # valor del volumen
+    volume_value = font.render(str(runSettingsMenu.volume), True, (255,255,255))
+    screen.blit(volume_value, (slider_x + slider_width + 20, slider_y - 10))
 
     # CHECKBOX
     pygame.draw.rect(screen, (200, 200, 200), (checkbox_x, checkbox_y, box_size, box_size), 2)
@@ -136,7 +137,6 @@ def runSettingsMenu(screen, events, bg):
     if runSettingsMenu.fullscreen:
         pygame.draw.line(screen, (255, 100, 200), (checkbox_x, checkbox_y), (checkbox_x + box_size, checkbox_y + box_size), 3)
         pygame.draw.line(screen, (255, 100, 200), (checkbox_x + box_size, checkbox_y), (checkbox_x, checkbox_y + box_size), 3)
-    
     
     backButton.update(mouse_pos)
     saveButton.update(mouse_pos)       
@@ -159,7 +159,6 @@ def runSettingsMenu(screen, events, bg):
         runSettingsMenu.action = None
         return 1
     
-    # Actualizar 
     pygame.display.flip()
     
     return 2
