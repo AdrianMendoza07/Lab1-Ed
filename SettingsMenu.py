@@ -17,10 +17,22 @@ def runSettingsMenu(screen, events, bg):
         runSettingsMenu.saveButton = Button("Guardar", 200, 60, (WIDTH//2 - 110, HEIGHT - 100), runSettingsMenu.button_font)
         runSettingsMenu.backButton = Button("Atras", 200, 60, (WIDTH//2 + 110, HEIGHT - 100), runSettingsMenu.button_font)
 
-        runSettingsMenu.volume = 50
-        runSettingsMenu.difficulty = "Normal"
+        # cargar datos guardados
+        data = repo.get_settings("game_settings")
 
-        runSettingsMenu.slider_x = WIDTH//2 + 20
+        if data:
+            runSettingsMenu.volume = data["data"]["volume"]
+            runSettingsMenu.difficulty = data["data"]["difficulty"]
+        else:
+            runSettingsMenu.volume = 50
+            runSettingsMenu.difficulty = "Normal"
+
+        # guardar copia original
+        runSettingsMenu.original_volume = runSettingsMenu.volume
+        runSettingsMenu.original_difficulty = runSettingsMenu.difficulty
+
+        # slider más a la izquierda
+        runSettingsMenu.slider_x = WIDTH//2 - 40
         runSettingsMenu.slider_y = HEIGHT//2 - 50
         runSettingsMenu.slider_width = 200
         runSettingsMenu.slider_height = 10
@@ -76,9 +88,9 @@ def runSettingsMenu(screen, events, bg):
 
     font = runSettingsMenu.button_font
 
-    # -------- VOLUMEN --------
+    # volumen (movido a la izquierda)
     vol_text = font.render("Volumen:", True, (255,255,255))
-    screen.blit(vol_text, (WIDTH//2 - 250, HEIGHT//2 - 60))
+    screen.blit(vol_text, (WIDTH//2 - 300, HEIGHT//2 - 60))
 
     pygame.draw.rect(screen, (100, 100, 120), (slider_x, slider_y, slider_width, slider_height), border_radius=5)
 
@@ -91,7 +103,7 @@ def runSettingsMenu(screen, events, bg):
     volume_value = font.render(str(runSettingsMenu.volume), True, (255,255,255))
     screen.blit(volume_value, (slider_x + slider_width + 20, slider_y - 10))
 
-    # -------- DIFICULTAD (CENTRADA) --------
+    # dificultad centrada
     diff_surf = font.render(f"Dificultad: {runSettingsMenu.difficulty}", True, (0,255,200))
     screen.blit(diff_surf, diff_surf.get_rect(center=(WIDTH//2, HEIGHT//2 + 20)))
 
@@ -101,6 +113,7 @@ def runSettingsMenu(screen, events, bg):
     backButton.draw(screen)
     saveButton.draw(screen)
 
+    # guardar
     if runSettingsMenu.action == "save" and saveButton.is_ready():
         repo.save_settings(
             "game_settings",
@@ -108,9 +121,18 @@ def runSettingsMenu(screen, events, bg):
             runSettingsMenu.difficulty,
             False
         )
+
+        # actualizar valores originales
+        runSettingsMenu.original_volume = runSettingsMenu.volume
+        runSettingsMenu.original_difficulty = runSettingsMenu.difficulty
+
         runSettingsMenu.action = None
     
+    # volver sin guardar
     if runSettingsMenu.action == "back" and backButton.is_ready():
+        runSettingsMenu.volume = runSettingsMenu.original_volume
+        runSettingsMenu.difficulty = runSettingsMenu.original_difficulty
+
         runSettingsMenu.action = None
         return 1
     
