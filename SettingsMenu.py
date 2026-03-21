@@ -1,7 +1,7 @@
 import pygame
 import sys
 from Button import Button
-from Repositories.Settings_repository import SettingsRepository
+from Repositories.settings_repository import SettingsRepository
 
 repo = SettingsRepository()
 
