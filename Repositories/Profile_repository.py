@@ -23,4 +23,33 @@ class ProfileRepository:
         file.close()
         return line
     
-    
+    def get_all_profiles(self):
+        profiles = []
+        try:
+            with open("data.log", "r") as file:
+                for line in file:
+                    line = line.strip()
+                    # 🔥 skip empty lines
+                    if not line:
+                        continue
+
+                    parts = line.split(",")
+
+                    # 🔥 skip corrupted lines
+                    if len(parts) < 4:
+                        print(f"Skipping invalid line: {line}")
+                        continue
+
+                    profile = {
+                        "id": parts[0],
+                        "name": parts[1],
+                        "score": int(parts[2]),
+                        "max_score": int(parts[3])
+                    }
+
+                    profiles.append(profile)
+
+        except FileNotFoundError:
+            pass
+
+        return profiles

@@ -40,6 +40,9 @@ def runStartMenu(screen, events, bg):
 
         if settingsButton.handle_event(event):
             runStartMenu.action = "settings"
+        
+        if leaderboardButton.handle_event(event):
+            runStartMenu.action = "leaderboard"
 
         if quitButton.handle_event(event):
             runStartMenu.action = "quit"
@@ -75,7 +78,9 @@ def runStartMenu(screen, events, bg):
     if runStartMenu.action == "settings" and settingsButton.is_ready():
         runStartMenu.action = None
         return 2
-
+    if runStartMenu.action == "leaderboard" and leaderboardButton.is_ready():
+        return 3
+    
     if runStartMenu.action == "quit" and quitButton.is_ready():
         return 0
 
