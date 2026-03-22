@@ -16,29 +16,33 @@ def runSettingsMenu(screen, events, bg):
         runSettingsMenu.saveButton = Button("Guardar", 200, 60, (WIDTH//2 - 110, HEIGHT - 100), runSettingsMenu.button_font)
         runSettingsMenu.backButton = Button("Atras", 200, 60, (WIDTH//2 + 110, HEIGHT - 100), runSettingsMenu.button_font)
 
-        # CARGAR DATOS
         data = repo.get_settings("game_settings")
 
         if data:
             runSettingsMenu.volume = data["data"]["volume"]
             runSettingsMenu.difficulty = data["data"]["difficulty"]
+            runSettingsMenu.fullscreen = data["data"].get("fullscreen", False)
         else:
             runSettingsMenu.volume = 50
             runSettingsMenu.difficulty = "Easy"
+            runSettingsMenu.fullscreen = False
 
-        # COPIA ORIGINAL
         runSettingsMenu.original_volume = runSettingsMenu.volume
         runSettingsMenu.original_difficulty = runSettingsMenu.difficulty
+        runSettingsMenu.original_fullscreen = runSettingsMenu.fullscreen
 
-        # SLIDER
         runSettingsMenu.slider_x = WIDTH//2 - 40
         runSettingsMenu.slider_y = HEIGHT//2 - 50
         runSettingsMenu.slider_width = 200
         runSettingsMenu.slider_height = 10
 
-        # BOTONES DE DIFICULTAD
+        # BOTONES DIFICULTAD
         runSettingsMenu.easy_rect = pygame.Rect(WIDTH//2 - 20, HEIGHT//2 + 20, 120, 50)
         runSettingsMenu.hard_rect = pygame.Rect(WIDTH//2 + 140, HEIGHT//2 + 20, 120, 50)
+
+        # BOTONES FULLSCREEN
+        runSettingsMenu.fs_on_rect = pygame.Rect(WIDTH//2 - 20, HEIGHT//2 + 100, 120, 50)
+        runSettingsMenu.fs_off_rect = pygame.Rect(WIDTH//2 + 140, HEIGHT//2 + 100, 120, 50)
 
         runSettingsMenu.action = None
 
@@ -48,9 +52,7 @@ def runSettingsMenu(screen, events, bg):
     slider_x = runSettingsMenu.slider_x
     slider_y = runSettingsMenu.slider_y
     slider_width = runSettingsMenu.slider_width
-    slider_height = runSettingsMenu.slider_height
 
-    # EVENTOS
     for event in events:
         if event.type == pygame.QUIT:
             return 0
@@ -65,17 +67,23 @@ def runSettingsMenu(screen, events, bg):
             mx, my = pygame.mouse.get_pos()
 
             # SLIDER
-            if slider_x <= mx <= slider_x + slider_width and slider_y - 10 <= my <= slider_y + 20:
+            if slider_x <= mx <= slider_x + slider_width:
                 porcentaje = (mx - slider_x) / slider_width
                 runSettingsMenu.volume = int(porcentaje * 100)
 
-            # CLICK EASY
+            # DIFICULTAD
             if runSettingsMenu.easy_rect.collidepoint(mx, my):
                 runSettingsMenu.difficulty = "Easy"
 
-            # CLICK HARD
             if runSettingsMenu.hard_rect.collidepoint(mx, my):
                 runSettingsMenu.difficulty = "Hard"
+
+            # FULLSCREEN
+            if runSettingsMenu.fs_on_rect.collidepoint(mx, my):
+                runSettingsMenu.fullscreen = True
+
+            if runSettingsMenu.fs_off_rect.collidepoint(mx, my):
+                runSettingsMenu.fullscreen = False
 
         if backButton.handle_event(event):
             runSettingsMenu.action = "back"
@@ -85,10 +93,9 @@ def runSettingsMenu(screen, events, bg):
 
     mouse_pos = pygame.mouse.get_pos()
 
-    # FONDO
     screen.blit(bg, (0, 0))
 
-    panel = pygame.Surface((600, 300))
+    panel = pygame.Surface((600, 350))
     panel.set_alpha(120)
     panel.fill((10, 10, 30))
     screen.blit(panel, panel.get_rect(center=(WIDTH//2, HEIGHT//2)))
@@ -102,44 +109,36 @@ def runSettingsMenu(screen, events, bg):
     vol_text = font.render("Volumen:", True, (255,255,255))
     screen.blit(vol_text, (WIDTH//2 - 300, HEIGHT//2 - 60))
 
-    pygame.draw.rect(screen, (100, 100, 120), (slider_x, slider_y, slider_width, slider_height), border_radius=5)
+    pygame.draw.rect(screen, (100, 100, 120), (slider_x, runSettingsMenu.slider_y, 200, 10))
+    progress = (runSettingsMenu.volume / 100) * 200
+    pygame.draw.rect(screen, (0, 255, 200), (slider_x, runSettingsMenu.slider_y, progress, 10))
 
-    progress = (runSettingsMenu.volume / 100) * slider_width
-    pygame.draw.rect(screen, (0, 255, 200), (slider_x, slider_y, progress, slider_height), border_radius=5)
-
-    handle_x = slider_x + progress
-    pygame.draw.circle(screen, (200, 255, 255), (int(handle_x), slider_y + slider_height//2), 8)
-
-    volume_value = font.render(str(runSettingsMenu.volume), True, (255,255,255))
-    screen.blit(volume_value, (slider_x + slider_width + 20, slider_y - 10))
-
-    # DIFICULTAD (BOTONES)
-
+    # DIFICULTAD
     diff_title = font.render("Dificultad:", True, (255,255,255))
     screen.blit(diff_title, (WIDTH//2 - 300, HEIGHT//2 + 20))
 
-    # COLORES
-    easy_color = (0, 200, 100) if runSettingsMenu.difficulty == "Easy" else (80, 80, 80)
-    hard_color = (200, 50, 50) if runSettingsMenu.difficulty == "Hard" else (80, 80, 80)
+    easy_color = (0,200,100) if runSettingsMenu.difficulty == "Easy" else (80,80,80)
+    hard_color = (200,50,50) if runSettingsMenu.difficulty == "Hard" else (80,80,80)
 
-    # HOVER
-    if runSettingsMenu.easy_rect.collidepoint(mouse_pos):
-        easy_color = (0, 255, 150)
-
-    if runSettingsMenu.hard_rect.collidepoint(mouse_pos):
-        hard_color = (255, 80, 80)
-
-    # DIBUJAR BOTONES
     pygame.draw.rect(screen, easy_color, runSettingsMenu.easy_rect, border_radius=10)
     pygame.draw.rect(screen, hard_color, runSettingsMenu.hard_rect, border_radius=10)
 
-    easy_text = font.render("Easy", True, (255,255,255))
-    hard_text = font.render("Hard", True, (255,255,255))
+    screen.blit(font.render("Easy", True, (255,255,255)), runSettingsMenu.easy_rect.move(20,10))
+    screen.blit(font.render("Hard", True, (255,255,255)), runSettingsMenu.hard_rect.move(20,10))
 
-    screen.blit(easy_text, easy_text.get_rect(center=runSettingsMenu.easy_rect.center))
-    screen.blit(hard_text, hard_text.get_rect(center=runSettingsMenu.hard_rect.center))
+    # FULLSCREEN
+    fs_title = font.render("Pantalla:", True, (255,255,255))
+    screen.blit(fs_title, (WIDTH//2 - 300, HEIGHT//2 + 100))
 
-    # BOTONES GENERALES
+    on_color = (0,200,100) if runSettingsMenu.fullscreen else (80,80,80)
+    off_color = (200,50,50) if not runSettingsMenu.fullscreen else (80,80,80)
+
+    pygame.draw.rect(screen, on_color, runSettingsMenu.fs_on_rect, border_radius=10)
+    pygame.draw.rect(screen, off_color, runSettingsMenu.fs_off_rect, border_radius=10)
+
+    screen.blit(font.render("ON", True, (255,255,255)), runSettingsMenu.fs_on_rect.move(35,10))
+    screen.blit(font.render("OFF", True, (255,255,255)), runSettingsMenu.fs_off_rect.move(30,10))
+
     backButton.update(mouse_pos)
     saveButton.update(mouse_pos)
 
@@ -151,11 +150,13 @@ def runSettingsMenu(screen, events, bg):
         repo.save_settings(
             "game_settings",
             runSettingsMenu.volume,
-            runSettingsMenu.difficulty
+            runSettingsMenu.difficulty,
+            runSettingsMenu.fullscreen
         )
 
         runSettingsMenu.original_volume = runSettingsMenu.volume
         runSettingsMenu.original_difficulty = runSettingsMenu.difficulty
+        runSettingsMenu.original_fullscreen = runSettingsMenu.fullscreen
 
         runSettingsMenu.action = None
 
@@ -163,10 +164,10 @@ def runSettingsMenu(screen, events, bg):
     if runSettingsMenu.action == "back" and backButton.is_ready():
         runSettingsMenu.volume = runSettingsMenu.original_volume
         runSettingsMenu.difficulty = runSettingsMenu.original_difficulty
+        runSettingsMenu.fullscreen = runSettingsMenu.original_fullscreen
 
         runSettingsMenu.action = None
         return 1
 
     pygame.display.flip()
-
     return 2

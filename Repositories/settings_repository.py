@@ -10,11 +10,12 @@ class SettingsRepository:
 
         self._rebuild_index()
 
-    def save_settings(self, key, volume, difficulty):
+    def save_settings(self, key, volume, difficulty, fullscreen):
         volume = max(0, min(100, volume))
         data = {
             "volume": volume,
             "difficulty": difficulty
+            "fullscreen": fullscreen
         }
 
         record = json.dumps({
@@ -64,4 +65,8 @@ def get_difficulty():
     if data:
         return data["data"]["difficulty"]
 
-    return "Normal"
+    return {
+        "volume": 50,
+        "difficulty": "Easy",
+        "fullscreen": False
+    }
