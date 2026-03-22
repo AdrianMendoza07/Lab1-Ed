@@ -8,7 +8,10 @@ class SettingsRepository:
         self.table = HashTable()
         self.store = RecordStore()
 
+        self._rebuild_index()
+
     def save_settings(self, key, volume, difficulty):
+        volume = max(0, min(100, volume))
         data = {
             "volume": volume,
             "difficulty": difficulty
@@ -35,3 +38,28 @@ class SettingsRepository:
 
         return json.loads(line)
 
+    def _rebuild_index(self):
+        try:
+            with open("data.log", "r") as file:
+                offset = 0
+
+                for line in file:
+                    record = json.loads(line)
+                    key = record["key"]
+                    
+                    self.table.insert(key, offset)
+
+                    offset = file.tell()
+
+        except FileNotFoundError:
+            pass
+
+
+def get_difficulty():
+    repo = SettingsRepository()
+    data = repo.get_settings("game_settings")
+
+    if data:
+        return data["data"]["difficulty"]
+
+    return "Normal"

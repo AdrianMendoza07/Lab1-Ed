@@ -57,10 +57,11 @@ def runSettingsMenu(screen, events, bg):
             if event.key == pygame.K_DOWN:
                 runSettingsMenu.volume = max(0, runSettingsMenu.volume - 5)
 
-            if event.key == pygame.K_RIGHT:
-                runSettingsMenu.difficulty = "Hard"
-            if event.key == pygame.K_LEFT:
-                runSettingsMenu.difficulty = "Easy"
+            if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                if runSettingsMenu.difficulty == "Easy":
+                    runSettingsMenu.difficulty = "Hard"
+                else:
+                    runSettingsMenu.difficulty = "Easy"
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             mx, my = pygame.mouse.get_pos()
@@ -118,8 +119,7 @@ def runSettingsMenu(screen, events, bg):
         repo.save_settings(
             "game_settings",
             runSettingsMenu.volume,
-            runSettingsMenu.difficulty,
-            False
+            runSettingsMenu.difficulty
         )
 
         # actualizar valores originales
