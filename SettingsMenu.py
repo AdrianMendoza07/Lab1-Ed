@@ -37,8 +37,8 @@ def runSettingsMenu(screen, events, bg):
         runSettingsMenu.slider_height = 10
 
         # BOTONES DE DIFICULTAD
-        runSettingsMenu.easy_rect = pygame.Rect(WIDTH//2 - 160, HEIGHT//2 + 20, 120, 50)
-        runSettingsMenu.hard_rect = pygame.Rect(WIDTH//2 + 40, HEIGHT//2 + 20, 120, 50)
+        runSettingsMenu.easy_rect = pygame.Rect(WIDTH//2 - 20, HEIGHT//2 + 20, 120, 50)
+        runSettingsMenu.hard_rect = pygame.Rect(WIDTH//2 + 140, HEIGHT//2 + 20, 120, 50)
 
         runSettingsMenu.action = None
 
