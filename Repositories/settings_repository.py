@@ -8,11 +8,10 @@ class SettingsRepository:
         self.table = HashTable()
         self.store = RecordStore()
 
-    def save_settings(self, key, volume, difficulty, fullscreen):
+    def save_settings(self, key, volume, difficulty):
         data = {
             "volume": volume,
-            "difficulty": difficulty,
-            "fullscreen": fullscreen
+            "difficulty": difficulty
         }
 
         record = json.dumps({
