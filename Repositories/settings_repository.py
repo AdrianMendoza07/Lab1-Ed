@@ -39,20 +39,22 @@ class SettingsRepository:
         return json.loads(line)
 
     def _rebuild_index(self):
-        try:
-            with open("data.log", "r") as file:
-                offset = 0
+    try:
+        with open("data.log", "r") as file:
+            while True:
+                offset = file.tell()   
 
-                for line in file:
-                    record = json.loads(line)
-                    key = record["key"]
-                    
-                    self.table.insert(key, offset)
+                line = file.readline()
+                if not line:
+                    break
 
-                    offset = file.tell()
+                record = json.loads(line)
+                key = record["key"]
 
-        except FileNotFoundError:
-            pass
+                self.table.insert(key, offset)
+
+    except FileNotFoundError:
+        pass
 
 
 def get_difficulty():
