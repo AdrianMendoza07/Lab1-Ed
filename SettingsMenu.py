@@ -34,13 +34,12 @@ def runSettingsMenu(screen, events, bg):
         runSettingsMenu.slider_x = WIDTH//2 - 40
         runSettingsMenu.slider_y = HEIGHT//2 - 50
         runSettingsMenu.slider_width = 200
-        runSettingsMenu.slider_height = 10
 
-        # BOTONES DIFICULTAD
+        # Dificultad
         runSettingsMenu.easy_rect = pygame.Rect(WIDTH//2 - 20, HEIGHT//2 + 20, 120, 50)
         runSettingsMenu.hard_rect = pygame.Rect(WIDTH//2 + 140, HEIGHT//2 + 20, 120, 50)
 
-        # BOTONES FULLSCREEN
+        # Fullscreen
         runSettingsMenu.fs_on_rect = pygame.Rect(WIDTH//2 - 20, HEIGHT//2 + 100, 120, 50)
         runSettingsMenu.fs_off_rect = pygame.Rect(WIDTH//2 + 140, HEIGHT//2 + 100, 120, 50)
 
@@ -66,19 +65,21 @@ def runSettingsMenu(screen, events, bg):
         if event.type == pygame.MOUSEBUTTONDOWN:
             mx, my = pygame.mouse.get_pos()
 
-            # SLIDER
-            if slider_x <= mx <= slider_x + slider_width:
+            # Slider volumen
+            if (slider_x <= mx <= slider_x + slider_width and 
+                slider_y - 10 <= my <= slider_y + 20):
+
                 porcentaje = (mx - slider_x) / slider_width
                 runSettingsMenu.volume = int(porcentaje * 100)
 
-            # DIFICULTAD
+            # Dificultad
             if runSettingsMenu.easy_rect.collidepoint(mx, my):
                 runSettingsMenu.difficulty = "Easy"
 
             if runSettingsMenu.hard_rect.collidepoint(mx, my):
                 runSettingsMenu.difficulty = "Hard"
 
-            # FULLSCREEN
+            # Fullscreen
             if runSettingsMenu.fs_on_rect.collidepoint(mx, my):
                 runSettingsMenu.fullscreen = True
 
@@ -105,13 +106,20 @@ def runSettingsMenu(screen, events, bg):
 
     font = runSettingsMenu.button_font
 
-    # VOLUMEN
+    # VOLUMEN 
     vol_text = font.render("Volumen:", True, (255,255,255))
     screen.blit(vol_text, (WIDTH//2 - 300, HEIGHT//2 - 60))
 
-    pygame.draw.rect(screen, (100, 100, 120), (slider_x, runSettingsMenu.slider_y, 200, 10))
-    progress = (runSettingsMenu.volume / 100) * 200
-    pygame.draw.rect(screen, (0, 255, 200), (slider_x, runSettingsMenu.slider_y, progress, 10))
+    pygame.draw.rect(screen, (100,100,120), (slider_x, slider_y, slider_width, 10), border_radius=5)
+
+    progress = (runSettingsMenu.volume / 100) * slider_width
+    pygame.draw.rect(screen, (0,255,200), (slider_x, slider_y, progress, 10), border_radius=5)
+
+    handle_x = slider_x + progress
+    pygame.draw.circle(screen, (200,255,255), (int(handle_x), slider_y + 5), 8)
+
+    volume_value = font.render(str(runSettingsMenu.volume), True, (255,255,255))
+    screen.blit(volume_value, (slider_x + slider_width + 20, slider_y - 10))
 
     # DIFICULTAD
     diff_title = font.render("Dificultad:", True, (255,255,255))
@@ -139,6 +147,7 @@ def runSettingsMenu(screen, events, bg):
     screen.blit(font.render("ON", True, (255,255,255)), runSettingsMenu.fs_on_rect.move(35,10))
     screen.blit(font.render("OFF", True, (255,255,255)), runSettingsMenu.fs_off_rect.move(30,10))
 
+    # Botones
     backButton.update(mouse_pos)
     saveButton.update(mouse_pos)
 
@@ -147,6 +156,7 @@ def runSettingsMenu(screen, events, bg):
 
     # GUARDAR
     if runSettingsMenu.action == "save" and saveButton.is_ready():
+
         repo.save_settings(
             "game_settings",
             runSettingsMenu.volume,
@@ -154,13 +164,23 @@ def runSettingsMenu(screen, events, bg):
             runSettingsMenu.fullscreen
         )
 
+        # aplicar fullscreen
+        if runSettingsMenu.fullscreen:
+            screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+        else:
+            screen = pygame.display.set_mode((800, 600))
+
+        bg = pygame.transform.scale(bg, screen.get_size())
+
         runSettingsMenu.original_volume = runSettingsMenu.volume
         runSettingsMenu.original_difficulty = runSettingsMenu.difficulty
         runSettingsMenu.original_fullscreen = runSettingsMenu.fullscreen
 
         runSettingsMenu.action = None
 
-    # VOLVER
+        return 2, screen, bg
+
+    # VOLVER 
     if runSettingsMenu.action == "back" and backButton.is_ready():
         runSettingsMenu.volume = runSettingsMenu.original_volume
         runSettingsMenu.difficulty = runSettingsMenu.original_difficulty
