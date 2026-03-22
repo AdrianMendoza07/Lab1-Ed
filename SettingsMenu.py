@@ -7,30 +7,47 @@ repo = SettingsRepository()
 def runSettingsMenu(screen, events, bg):
     WIDTH, HEIGHT = screen.get_size()
 
+    # Detectar cambio de resolución para reinicializar layout
+    if not hasattr(runSettingsMenu, "last_size") or runSettingsMenu.last_size != (WIDTH, HEIGHT):
+        runSettingsMenu.initialized = False
+        runSettingsMenu.last_size = (WIDTH, HEIGHT)
+
+    # Reinicializa si cambia tamaño
     if not hasattr(runSettingsMenu, "initialized") or runSettingsMenu.initialized == False:
         runSettingsMenu.initialized = True
 
-        # FUENTES
+        # Fuentes responsive
         title_size = int(HEIGHT * 0.1)
         button_size = int(HEIGHT * 0.045)
 
         runSettingsMenu.title_font = pygame.font.Font("assets/fonts/Orbitron-Bold.ttf", title_size)
         runSettingsMenu.button_font = pygame.font.Font("assets/fonts/Orbitron-Regular.ttf", button_size)
 
-        # BOTONES
+        # Tamaños de botones responsive
+        button_width = int(WIDTH * 0.18)
+        button_height = int(HEIGHT * 0.08)
+        spacing = int(WIDTH * 0.02)
+
+        center_x = WIDTH // 2
+
+        # Botones
         runSettingsMenu.saveButton = Button(
-            "Guardar", 200, 60,
-            (WIDTH//2 - 150, int(HEIGHT * 0.85)),
+            "Guardar",
+            button_width,
+            button_height,
+            (center_x - button_width - spacing//2, int(HEIGHT * 0.85)),
             runSettingsMenu.button_font
         )
 
         runSettingsMenu.backButton = Button(
-            "Atras", 200, 60,
-            (WIDTH//2 + 150, int(HEIGHT * 0.85)),
+            "Atras",
+            button_width,
+            button_height,
+            (center_x + spacing//2, int(HEIGHT * 0.85)),
             runSettingsMenu.button_font
         )
 
-        # CARGAR DATOS 
+        # Cargar datos
         data = repo.get_settings("game_settings")
 
         if data:
@@ -46,12 +63,12 @@ def runSettingsMenu(screen, events, bg):
         runSettingsMenu.original_difficulty = runSettingsMenu.difficulty
         runSettingsMenu.original_fullscreen = runSettingsMenu.fullscreen
 
-        # SLIDER
+        # Slider
         runSettingsMenu.slider_x = int(WIDTH * 0.45)
         runSettingsMenu.slider_y = int(HEIGHT * 0.4)
         runSettingsMenu.slider_width = int(WIDTH * 0.25)
 
-        # BOTONES DIFICULTAD
+        # Botones dificultad
         runSettingsMenu.easy_rect = pygame.Rect(
             int(WIDTH * 0.45), int(HEIGHT * 0.5),
             int(WIDTH * 0.12), int(HEIGHT * 0.07)
@@ -62,7 +79,7 @@ def runSettingsMenu(screen, events, bg):
             int(WIDTH * 0.12), int(HEIGHT * 0.07)
         )
 
-        # ===== BOTONES FULLSCREEN =====
+        # Botones fullscreen
         runSettingsMenu.fs_on_rect = pygame.Rect(
             int(WIDTH * 0.45), int(HEIGHT * 0.65),
             int(WIDTH * 0.12), int(HEIGHT * 0.07)
@@ -82,7 +99,7 @@ def runSettingsMenu(screen, events, bg):
     slider_y = runSettingsMenu.slider_y
     slider_width = runSettingsMenu.slider_width
 
-    # EVENTOS 
+    # Eventos
     for event in events:
         if event.type == pygame.QUIT:
             return 0
@@ -90,21 +107,21 @@ def runSettingsMenu(screen, events, bg):
         if event.type == pygame.MOUSEBUTTONDOWN:
             mx, my = pygame.mouse.get_pos()
 
-            # VOLUMEN
+            # Volumen
             if (slider_x <= mx <= slider_x + slider_width and 
                 slider_y - 10 <= my <= slider_y + 20):
 
                 porcentaje = (mx - slider_x) / slider_width
                 runSettingsMenu.volume = int(porcentaje * 100)
 
-            # DIFICULTAD
+            # Dificultad
             if runSettingsMenu.easy_rect.collidepoint(mx, my):
                 runSettingsMenu.difficulty = "Easy"
 
             if runSettingsMenu.hard_rect.collidepoint(mx, my):
                 runSettingsMenu.difficulty = "Hard"
 
-            # FULLSCREEN
+            # Fullscreen
             if runSettingsMenu.fs_on_rect.collidepoint(mx, my):
                 runSettingsMenu.fullscreen = True
 
@@ -119,10 +136,10 @@ def runSettingsMenu(screen, events, bg):
 
     mouse_pos = pygame.mouse.get_pos()
 
-    # DIBUJO 
+    # Dibujo
     screen.blit(bg, (0, 0))
 
-    # PANEL RESPONSIVE
+    # Panel responsive
     panel_width = int(WIDTH * 0.6)
     panel_height = int(HEIGHT * 0.6)
 
@@ -133,11 +150,11 @@ def runSettingsMenu(screen, events, bg):
 
     font = runSettingsMenu.button_font
 
-    # TITULO 
+    # Titulo
     title = runSettingsMenu.title_font.render("Opciones", True, (210, 15, 240))
     screen.blit(title, title.get_rect(center=(WIDTH//2, int(HEIGHT * 0.15))))
 
-    # VOLUMEN 
+    # Volumen
     vol_text = font.render("Volumen:", True, (255,255,255))
     screen.blit(vol_text, (int(WIDTH * 0.2), slider_y - 20))
 
@@ -152,7 +169,7 @@ def runSettingsMenu(screen, events, bg):
     volume_value = font.render(str(runSettingsMenu.volume), True, (255,255,255))
     screen.blit(volume_value, (slider_x + slider_width + 10, slider_y - 10))
 
-    # DIFICULTAD 
+    # Dificultad
     diff_title = font.render("Dificultad:", True, (255,255,255))
     screen.blit(diff_title, (int(WIDTH * 0.2), int(HEIGHT * 0.5)))
 
@@ -165,7 +182,7 @@ def runSettingsMenu(screen, events, bg):
     screen.blit(font.render("Easy", True, (255,255,255)), runSettingsMenu.easy_rect.move(20,10))
     screen.blit(font.render("Hard", True, (255,255,255)), runSettingsMenu.hard_rect.move(20,10))
 
-    # FULLSCREEN 
+    # Fullscreen
     fs_title = font.render("Pantalla:", True, (255,255,255))
     screen.blit(fs_title, (int(WIDTH * 0.2), int(HEIGHT * 0.65)))
 
@@ -178,14 +195,14 @@ def runSettingsMenu(screen, events, bg):
     screen.blit(font.render("ON", True, (255,255,255)), runSettingsMenu.fs_on_rect.move(30,10))
     screen.blit(font.render("OFF", True, (255,255,255)), runSettingsMenu.fs_off_rect.move(25,10))
 
-    # BOTONES
+    # Botones
     backButton.update(mouse_pos)
     saveButton.update(mouse_pos)
 
     backButton.draw(screen)
     saveButton.draw(screen)
 
-    # GUARDAR
+    # Guardar
     if runSettingsMenu.action == "save" and saveButton.is_ready():
 
         repo.save_settings(
@@ -207,7 +224,7 @@ def runSettingsMenu(screen, events, bg):
 
         return 2, screen, bg
 
-    # VOLVER 
+    # Volver
     if runSettingsMenu.action == "back" and backButton.is_ready():
         runSettingsMenu.action = None
         return 1
