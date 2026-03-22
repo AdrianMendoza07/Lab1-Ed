@@ -14,7 +14,7 @@ class SettingsRepository:
         volume = max(0, min(100, volume))
         data = {
             "volume": volume,
-            "difficulty": difficulty
+            "difficulty": difficulty,
             "fullscreen": fullscreen
         }
 
