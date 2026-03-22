@@ -58,12 +58,12 @@ class SettingsRepository:
             pass
 
 
-def get_difficulty():
+def get_settings_data():
     repo = SettingsRepository()
     data = repo.get_settings("game_settings")
 
     if data:
-        return data["data"]["difficulty"]
+        return data["data"]
 
     return {
         "volume": 50,
