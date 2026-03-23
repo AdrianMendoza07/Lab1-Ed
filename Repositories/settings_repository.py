@@ -7,23 +7,18 @@ class SettingsRepository:
         self._rebuild_index()
 
     def _rebuild_index(self):
+        """Reconstruye el índice de settings desde el store"""
         self.table.clear()
-        if hasattr(self.store, "records"):
-            records = self.store.records
-        elif hasattr(self.store, "get_all_records"):
-            records = self.store.get_all_records()
-        else:
-            records = []
-            print("WARNING: RecordStore no tiene records ni get_all_records")
+        records = self.store.get_all_records() if hasattr(self.store, "get_all_records") else []
 
         for record in records:
             if not record.strip():
                 continue
             parts = record.split(",")
-            if len(parts) < 2:
+            if len(parts) < 9:
                 print(f"WARNING: registro inválido ignorado -> {record}")
                 continue
-            key = parts[1].strip()
+            key = parts[5].strip()  
             self.table[key] = record
 
     def get_settings(self, key):
@@ -34,20 +29,34 @@ class SettingsRepository:
         try:
             return {
                 "data": {
-                    "volume": int(parts[2]),
-                    "difficulty": parts[3],
-                    "fullscreen": parts[4].lower() == "true"
+                    "volume": int(parts[6]),
+                    "difficulty": parts[7],
+                    "fullscreen": parts[8].lower() == "true"
                 }
             }
         except IndexError:
+            print(f"WARNING: datos incompletos en registro -> {record}")
             return None
 
     def save_settings(self, key, volume, difficulty, fullscreen):
-        record = f"user,{key},{volume},{difficulty},{fullscreen}"
-        if hasattr(self.store, "add_record"):
-            self.store.add_record(record)
+        existing = self.table.get(key)
+        if existing:
+            parts = existing.split(",")
+            parts[6] = str(volume)
+            parts[7] = difficulty
+            parts[8] = str(fullscreen)
+            record = ",".join(parts)
+            if hasattr(self.store, "update_record"):
+                self.store.update_record(record)
+            else:
+                print("WARNING: RecordStore no tiene update_record")
         else:
-            print("WARNING: RecordStore no tiene add_record")
+            record = f"player1,Nataly,200,1200,settings,{key},{volume},{difficulty},{fullscreen}"
+            if hasattr(self.store, "add_record"):
+                self.store.add_record(record)
+            else:
+                print("WARNING: RecordStore no tiene add_record")
+
         self._rebuild_index()
 
 
