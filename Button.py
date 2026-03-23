@@ -10,7 +10,7 @@ class Button:
 
         self.baseColor  = (20, 20, 50, 160)
         self.hoverColor = (60, 20, 90)
-        self.clickColor = (0, 255, 200)
+        self.clickColor = (0, 255, 200) 
         self.textColor  = (220, 240, 255)
 
         self.currentColor = self.baseColor
@@ -25,11 +25,13 @@ class Button:
                 self.is_pressed = True
                 self.press_time = pygame.time.get_ticks()
                 self.currentColor = self.clickColor
+                return False 
 
         if event.type == pygame.MOUSEBUTTONUP:
-            if self.rect.collidepoint(event.pos) and self.is_pressed:
-                return True
-
+            if self.is_pressed:
+                self.is_pressed = False
+                if self.rect.collidepoint(event.pos):
+                    return True
         return False
 
     def update(self, mouse_pos):
@@ -38,21 +40,30 @@ class Button:
                 self.currentColor = self.hoverColor
             else:
                 self.currentColor = self.baseColor
+        else:
+            if not self.rect.collidepoint(mouse_pos):
+                self.currentColor = self.baseColor
 
     def is_ready(self):
-        if self.is_pressed:
-            now = pygame.time.get_ticks()
-            if now - self.press_time >= self.delay:
-                self.is_pressed = False
-                return True
-        return False
+        return True 
 
-    def draw(self, screen):
+    def draw(self, screen, selected=False):
         surf = pygame.Surface((self.rect.width, self.rect.height), pygame.SRCALPHA)
+        
+
         pygame.draw.rect(surf, self.currentColor, surf.get_rect(), border_radius=12)
+        
+
+        if selected:
+            overlay = pygame.Surface((self.rect.width, self.rect.height), pygame.SRCALPHA)
+            overlay.fill((0, 0, 0, 160)) 
+            surf.blit(overlay, (0,0))
+
         screen.blit(surf, self.rect.topleft)
 
+ 
         pygame.draw.rect(screen, (160, 80, 255), self.rect, 2, border_radius=12)
 
+    
         text = self.font.render(self.text, True, self.textColor)
         screen.blit(text, text.get_rect(center=self.rect.center))
