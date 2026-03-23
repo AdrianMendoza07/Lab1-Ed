@@ -28,13 +28,13 @@ def runSettingsMenu(screen, events, bg):
         runSettingsMenu.label_font = pygame.font.Font("assets/fonts/Orbitron-Regular.ttf", label_size)
         runSettingsMenu.button_font = pygame.font.Font("assets/fonts/Orbitron-Regular.ttf", button_font_size)
 
-        # Altura entre filas
-        row_height = int(110 * scale) if is_fullscreen else int(85 * scale)
+
+        row_height = int(95 * scale) if is_fullscreen else int(80 * scale)
         
         if is_fullscreen:
-            start_y = center_y - (row_height * 1.8) 
+            start_y = center_y - (row_height * 2.0) 
         else:
-            start_y = center_y - (row_height * 2.0)
+            start_y = center_y - (row_height * 2.2)
 
         # Medidas botones
         btn_w = int(140 * scale)
@@ -44,7 +44,7 @@ def runSettingsMenu(screen, events, bg):
         # Slider Volumen
         runSettingsMenu.slider_width = int(WIDTH * 0.4)
         runSettingsMenu.slider_x = center_x - runSettingsMenu.slider_width // 2
-        runSettingsMenu.slider_y = start_y + (30 if is_fullscreen else 20)
+        runSettingsMenu.slider_y = start_y + 20
         runSettingsMenu.slider_hitbox = pygame.Rect(runSettingsMenu.slider_x, runSettingsMenu.slider_y - 20, 
                                                    runSettingsMenu.slider_width, 40)
 
@@ -58,8 +58,8 @@ def runSettingsMenu(screen, events, bg):
         runSettingsMenu.fs_on_rect = pygame.Rect(center_x - btn_w - (gap//2), fs_y, btn_w, btn_h)
         runSettingsMenu.fs_off_rect = pygame.Rect(center_x + (gap//2), fs_y, btn_w, btn_h)
 
-        # 4. Botones Guardar / Atrás 
-        action_y = fs_y + row_height + int(15 * scale) 
+
+        action_y = fs_y + row_height + int(35 * scale) 
         
         shift_right = int(60 * scale)
         runSettingsMenu.saveButton = Button("Guardar", btn_w, btn_h,
@@ -69,7 +69,7 @@ def runSettingsMenu(screen, events, bg):
                                             (center_x + shift_right + (gap//4), action_y),
                                             runSettingsMenu.button_font)
 
-        # Panel
+        # Panel fijo 
         panel_w = int(runSettingsMenu.slider_width + (180 if is_fullscreen else 120))
         panel_h = int(HEIGHT * 0.75) 
         runSettingsMenu.panel_rect = pygame.Rect(0, 0, panel_w, panel_h)
@@ -87,7 +87,7 @@ def runSettingsMenu(screen, events, bg):
             runSettingsMenu.difficulty = "Easy"
             runSettingsMenu.fullscreen = False
 
-    # RENDERIZADO 
+    # RENDERIZADO
     mouse_pos = pygame.mouse.get_pos()
     screen.blit(bg, (0, 0))
     center_x = WIDTH // 2
@@ -97,6 +97,7 @@ def runSettingsMenu(screen, events, bg):
     panel_surf.fill((10, 5, 25))
     screen.blit(panel_surf, runSettingsMenu.panel_rect)
 
+    # Título
     title_text = runSettingsMenu.title_font.render("Opciones", True, (210, 15, 240))
     screen.blit(title_text, title_text.get_rect(center=(center_x, runSettingsMenu.panel_rect.top + 50)))
 
