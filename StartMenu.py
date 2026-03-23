@@ -46,13 +46,13 @@ def runStartMenu(screen, events, bg):
         runStartMenu.startButton = Button("Nuevo Juego", button_width, button_height, (center_x, start_y), runStartMenu.button_font)
 
         runStartMenu.leaderboardButton = Button("Leaderboard", button_width, button_height,
-                                                (center_x, start_y + spacing*2), runStartMenu.button_font)
+                                                (center_x, start_y + spacing), runStartMenu.button_font)
 
         runStartMenu.settingsButton = Button("Opcion", button_width, button_height,
-                                             (center_x, start_y + spacing*3), runStartMenu.button_font)
+                                            (center_x, start_y + spacing*2), runStartMenu.button_font)
 
         runStartMenu.quitButton = Button("Salir", button_width, button_height,
-                                         (center_x, start_y + spacing*4), runStartMenu.button_font)
+                                        (center_x, start_y + spacing*3), runStartMenu.button_font)
 
         runStartMenu.action = None
 

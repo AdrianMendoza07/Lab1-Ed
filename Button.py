@@ -63,7 +63,7 @@ class Button:
 
         screen.blit(surf, self.rect.topleft)
 
- 
+
         pygame.draw.rect(screen, (160, 80, 255), self.rect, 2, border_radius=12)
 
     

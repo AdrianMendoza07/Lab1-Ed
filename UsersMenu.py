@@ -127,11 +127,11 @@ def runUsersMenu(screen, events, bg):
     # Cambio de estado (para delay entre click y cambio)
     if runUsersMenu.action == "newGame" and newGameButton.is_ready():
         runUsersMenu.action = None
-        return 5
+        return 6
     
     if runUsersMenu.action == "newUser" and newUserButton.is_ready():
         runUsersMenu.action = None
-        return 4
+        return 5
 
     if runUsersMenu.action == "back" and backButton.is_ready():
         return 1

@@ -10,7 +10,7 @@ class ProfileRepository:
 
     def save_profile(self, player_id, name, score, max_score):
         record = player_id + "," + name + "," + str(score) + "," + str(max_score)
-        position = self.store.append(record)
+        position = self.store.add_record(record)
         self.table.insert(player_id, position)
 
     def get_profile(self, player_id):
@@ -23,7 +23,6 @@ class ProfileRepository:
         file.close()
         return line
     
-   
     def get_next_id(self):
         try:
             with open("data.log", "r") as file:
@@ -49,7 +48,6 @@ class ProfileRepository:
             with open("data.log", "r") as file:
                 for line in file:
                     line = line.strip()
-                    # 🔥 skip empty lines
 
                     
                     if not line:
@@ -57,7 +55,6 @@ class ProfileRepository:
 
                     parts = line.split(",")
 
-                    # 🔥 skip corrupted lines
                     
                     if len(parts) < 4:
                         print(f"Skipping invalid line: {line}")
@@ -76,3 +73,5 @@ class ProfileRepository:
             pass
 
         return profiles
+        
+    
