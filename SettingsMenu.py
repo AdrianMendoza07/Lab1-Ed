@@ -67,9 +67,9 @@ def runSettingsMenu(screen, events, bg, bg_original):
             (center_x + (btn_w // 2) + (gap // 2), diff_y),
             runSettingsMenu.button_font)
 
-
+        # Botones ON/OFF con ajuste solo en fullscreen
         fs_y = diff_y + row_height
-        offset_fs = 30 if is_fullscreen else 0  
+        offset_fs = 30 if is_fullscreen else 0  # baja más los botones solo en fullscreen
         runSettingsMenu.onBtn = Button("ON", btn_w, btn_h,
             (center_x - (btn_w // 2) - (gap // 2), fs_y + offset_fs),
             runSettingsMenu.button_font)
@@ -164,13 +164,13 @@ def runSettingsMenu(screen, events, bg, bg_original):
     ))
     screen.blit(diff_label, diff_label_rect)
 
-    # Etiqueta "Fullscreen"
+    # Etiqueta "Fullscreen" 
     fs_offset = -15 if is_fullscreen else 0  
     fs_label = runSettingsMenu.label_font.render("Fullscreen", True, (200, 200, 200))
     fs_label_rect = fs_label.get_rect(center=(
         WIDTH // 2,
-        runSettingsMenu.onBtn.rect.top - 10 + fs_offset  
-        ))
+        runSettingsMenu.onBtn.rect.top - 10 + fs_offset
+    ))
     screen.blit(fs_label, fs_label_rect)
 
     # Botones
