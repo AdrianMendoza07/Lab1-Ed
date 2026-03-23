@@ -17,7 +17,7 @@ def runSettingsMenu(screen, events, bg):
         is_fullscreen = screen.get_flags() & pygame.FULLSCREEN
         center_x = WIDTH // 2
 
-        # 🔥 CONFIGURACIÓN POR MODO
+        # CONFIGURACIÓN POR MODO
         if is_fullscreen:
             title_size = int(HEIGHT * 0.08)
             button_size = int(HEIGHT * 0.04)
@@ -28,7 +28,6 @@ def runSettingsMenu(screen, events, bg):
             buttons_y = int(HEIGHT * 0.85)
 
             panel_scale = 0.5
-
         else:
             title_size = int(HEIGHT * 0.06)
             button_size = int(HEIGHT * 0.03)
@@ -38,7 +37,7 @@ def runSettingsMenu(screen, events, bg):
             fs_y = int(HEIGHT * 0.55)
             buttons_y = int(HEIGHT * 0.72)
 
-            panel_scale = 0.75
+            panel_scale = 0.6  # 🔥 más pequeño
 
         # Fuentes
         runSettingsMenu.title_font = pygame.font.Font("assets/fonts/Orbitron-Bold.ttf", title_size)
@@ -64,18 +63,17 @@ def runSettingsMenu(screen, events, bg):
             runSettingsMenu.button_font
         )
 
-        # Slider
-        runSettingsMenu.slider_x = int(WIDTH * 0.4)
-        runSettingsMenu.slider_y = slider_y
+        # 🔥 SLIDER CENTRADO
         runSettingsMenu.slider_width = int(WIDTH * 0.3)
+        runSettingsMenu.slider_x = WIDTH // 2 - runSettingsMenu.slider_width // 2
+        runSettingsMenu.slider_y = slider_y
 
-        # Dificultad
-        runSettingsMenu.easy_rect = pygame.Rect(int(WIDTH * 0.4), diff_y, int(WIDTH * 0.12), int(HEIGHT * 0.07))
-        runSettingsMenu.hard_rect = pygame.Rect(int(WIDTH * 0.55), diff_y, int(WIDTH * 0.12), int(HEIGHT * 0.07))
+        # 🔥 BOTONES CENTRADOS
+        runSettingsMenu.easy_rect = pygame.Rect(center_x - 140, diff_y, 120, int(HEIGHT * 0.07))
+        runSettingsMenu.hard_rect = pygame.Rect(center_x + 20, diff_y, 120, int(HEIGHT * 0.07))
 
-        # Fullscreen
-        runSettingsMenu.fs_on_rect = pygame.Rect(int(WIDTH * 0.4), fs_y, int(WIDTH * 0.12), int(HEIGHT * 0.07))
-        runSettingsMenu.fs_off_rect = pygame.Rect(int(WIDTH * 0.55), fs_y, int(WIDTH * 0.12), int(HEIGHT * 0.07))
+        runSettingsMenu.fs_on_rect = pygame.Rect(center_x - 140, fs_y, 120, int(HEIGHT * 0.07))
+        runSettingsMenu.fs_off_rect = pygame.Rect(center_x + 20, fs_y, 120, int(HEIGHT * 0.07))
 
         runSettingsMenu.panel_scale = panel_scale
         runSettingsMenu.action = None
@@ -112,26 +110,34 @@ def runSettingsMenu(screen, events, bg):
     title_y = int(HEIGHT * (0.2 if is_fullscreen else 0.15))
     screen.blit(title, title.get_rect(center=(WIDTH//2, title_y)))
 
-    # Botones
+    # Botones inferiores
     runSettingsMenu.saveButton.update(mouse_pos)
     runSettingsMenu.backButton.update(mouse_pos)
     runSettingsMenu.saveButton.draw(screen)
     runSettingsMenu.backButton.draw(screen)
 
     # Slider
-    pygame.draw.rect(screen, (100,100,120), (runSettingsMenu.slider_x, runSettingsMenu.slider_y, runSettingsMenu.slider_width, 10), border_radius=5)
+    pygame.draw.rect(screen, (100,100,120),
+                     (runSettingsMenu.slider_x, runSettingsMenu.slider_y,
+                      runSettingsMenu.slider_width, 10), border_radius=5)
+
     progress = (runSettingsMenu.volume / 100) * runSettingsMenu.slider_width
-    pygame.draw.rect(screen, (0,255,200), (runSettingsMenu.slider_x, runSettingsMenu.slider_y, progress, 10), border_radius=5)
+
+    pygame.draw.rect(screen, (0,255,200),
+                     (runSettingsMenu.slider_x, runSettingsMenu.slider_y,
+                      progress, 10), border_radius=5)
 
     handle_x = runSettingsMenu.slider_x + progress
-    pygame.draw.circle(screen, (200,255,255), (int(handle_x), runSettingsMenu.slider_y + 5), 8)
+    pygame.draw.circle(screen, (200,255,255),
+                       (int(handle_x), runSettingsMenu.slider_y + 5), 8)
 
+    # 🔥 TEXTO CENTRADO
     screen.blit(font.render(f"Volumen: {runSettingsMenu.volume}", True, (255,255,255)),
-                (int(WIDTH*0.2), runSettingsMenu.slider_y - 20))
+                (WIDTH//2 - 250, runSettingsMenu.slider_y - 20))
 
     # Dificultad
     screen.blit(font.render("Dificultad:", True, (255,255,255)),
-                (int(WIDTH*0.2), runSettingsMenu.easy_rect.y))
+                (WIDTH//2 - 250, runSettingsMenu.easy_rect.y))
 
     easy_color = (0,200,100) if runSettingsMenu.difficulty=="Easy" else (80,80,80)
     hard_color = (200,50,50) if runSettingsMenu.difficulty=="Hard" else (80,80,80)
@@ -144,7 +150,7 @@ def runSettingsMenu(screen, events, bg):
 
     # Fullscreen
     screen.blit(font.render("Pantalla:", True, (255,255,255)),
-                (int(WIDTH*0.2), runSettingsMenu.fs_on_rect.y))
+                (WIDTH//2 - 250, runSettingsMenu.fs_on_rect.y))
 
     on_color = (0,200,100) if runSettingsMenu.fullscreen else (80,80,80)
     off_color = (200,50,50) if not runSettingsMenu.fullscreen else (80,80,80)

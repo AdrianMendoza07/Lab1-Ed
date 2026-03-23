@@ -36,7 +36,7 @@ def runStartMenu(screen, events, bg):
             button_height = 50
 
             start_y = int(HEIGHT * 0.35)
-            spacing = int(HEIGHT * 0.08)
+            spacing = int(HEIGHT * 0.11)
 
         # Fuentes
         runStartMenu.title_font = pygame.font.Font("assets/fonts/Orbitron-Bold.ttf", title_size)
