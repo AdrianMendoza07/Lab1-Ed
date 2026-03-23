@@ -3,15 +3,11 @@ from Persistence.Storage.Record_store import RecordStore
 class SettingsRepository:
     def __init__(self):
         self.store = RecordStore()
-        self.table = {}  # índice interno
+        self.table = {}
         self._rebuild_index()
 
     def _rebuild_index(self):
-        """Reconstruye el índice interno de los registros de manera segura."""
-
         self.table.clear()
-
-        # Obtener registros de manera segura
         if hasattr(self.store, "records"):
             records = self.store.records
         elif hasattr(self.store, "get_all_records"):
@@ -30,9 +26,6 @@ class SettingsRepository:
             key = parts[1].strip()
             self.table[key] = record
 
-    # -------------------
-    # Métodos de acceso
-    # -------------------
     def get_settings(self, key):
         record = self.table.get(key)
         if not record:
@@ -56,3 +49,16 @@ class SettingsRepository:
         else:
             print("WARNING: RecordStore no tiene add_record")
         self._rebuild_index()
+
+
+def get_settings_data():
+    """Retorna la configuración 'game_settings'"""
+    repo = SettingsRepository()
+    data = repo.get_settings("game_settings")
+    if data is None:
+        return {"volume": 50, "difficulty": "Easy", "fullscreen": False}
+    return {
+        "volume": data["data"]["volume"],
+        "difficulty": data["data"]["difficulty"],
+        "fullscreen": data["data"]["fullscreen"]
+    }
