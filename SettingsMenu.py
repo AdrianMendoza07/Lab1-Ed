@@ -2,15 +2,6 @@ import pygame
 from Button import Button
 from Repositories.settings_repository import SettingsRepository
 
-¡Entendido! Vamos a revertir el estiramiento del panel pero manteniendo los botones de Guardar y Atras en su posición más baja. Esto hará que los botones queden más cerca del borde inferior del panel, aprovechando mejor el espacio sin que el fondo oscuro se vea demasiado largo.
-
-Aquí tienes el código con el panel_h restaurado y los botones posicionados:
-
-Python
-import pygame
-from Button import Button
-from Repositories.settings_repository import SettingsRepository
-
 repo = SettingsRepository()
 
 def runSettingsMenu(screen, events, bg):
@@ -37,13 +28,12 @@ def runSettingsMenu(screen, events, bg):
         runSettingsMenu.label_font = pygame.font.Font("assets/fonts/Orbitron-Regular.ttf", label_size)
         runSettingsMenu.button_font = pygame.font.Font("assets/fonts/Orbitron-Regular.ttf", button_font_size)
 
-        # Altura entre filas corregida
+        # Altura entre filas
         row_height = int(110 * scale) if is_fullscreen else int(85 * scale)
         
         if is_fullscreen:
             start_y = center_y - (row_height * 1.8) 
         else:
-            # En ventana subimos el inicio para que los botones de dificultad/FS no queden tan abajo
             start_y = center_y - (row_height * 2.0)
 
         # Medidas botones
@@ -51,25 +41,24 @@ def runSettingsMenu(screen, events, bg):
         btn_h = int(50 * scale)
         gap = int(80 * scale) if is_fullscreen else int(25 * scale)
 
-        # 1. Slider Volumen
+        # Slider Volumen
         runSettingsMenu.slider_width = int(WIDTH * 0.4)
         runSettingsMenu.slider_x = center_x - runSettingsMenu.slider_width // 2
         runSettingsMenu.slider_y = start_y + (30 if is_fullscreen else 20)
         runSettingsMenu.slider_hitbox = pygame.Rect(runSettingsMenu.slider_x, runSettingsMenu.slider_y - 20, 
                                                    runSettingsMenu.slider_width, 40)
 
-        # 2. Dificultad
+        # Dificultad
         diff_y = runSettingsMenu.slider_y + row_height
         runSettingsMenu.easy_rect = pygame.Rect(center_x - btn_w - (gap//2), diff_y, btn_w, btn_h)
         runSettingsMenu.hard_rect = pygame.Rect(center_x + (gap//2), diff_y, btn_w, btn_h)
 
-        # 3. Fullscreen Buttons
+        # Fullscreen Buttons
         fs_y = diff_y + row_height
         runSettingsMenu.fs_on_rect = pygame.Rect(center_x - btn_w - (gap//2), fs_y, btn_w, btn_h)
         runSettingsMenu.fs_off_rect = pygame.Rect(center_x + (gap//2), fs_y, btn_w, btn_h)
 
-        # --- BOTONES BAJADOS ---
-        # Se mantienen abajo para que no choquen con lo de arriba
+        # 4. Botones Guardar / Atrás 
         action_y = fs_y + row_height + int(15 * scale) 
         
         shift_right = int(60 * scale)
@@ -80,10 +69,9 @@ def runSettingsMenu(screen, events, bg):
                                             (center_x + shift_right + (gap//4), action_y),
                                             runSettingsMenu.button_font)
 
-        # --- PANEL SIN ESTIRAR (Volvemos a valores anteriores) ---
+        # Panel
         panel_w = int(runSettingsMenu.slider_width + (180 if is_fullscreen else 120))
-        # Altura original (más compacta)
-        panel_h = int(HEIGHT * (0.75 if is_fullscreen else 0.75)) 
+        panel_h = int(HEIGHT * 0.75) 
         runSettingsMenu.panel_rect = pygame.Rect(0, 0, panel_w, panel_h)
         runSettingsMenu.panel_rect.center = (center_x, center_y)
 
@@ -99,7 +87,7 @@ def runSettingsMenu(screen, events, bg):
             runSettingsMenu.difficulty = "Easy"
             runSettingsMenu.fullscreen = False
 
-    # --- RENDERIZADO (Se mantiene igual) ---
+    # RENDERIZADO 
     mouse_pos = pygame.mouse.get_pos()
     screen.blit(bg, (0, 0))
     center_x = WIDTH // 2
