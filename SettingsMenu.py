@@ -32,19 +32,18 @@ def runSettingsMenu(screen, events, bg):
         row_height = int(95 * scale) if is_fullscreen else int(80 * scale)
         start_y = center_y - (row_height * 2.0) if is_fullscreen else center_y - (row_height * 2.2)
 
-        # Medidas comunes
         btn_w = int(140 * scale)
         btn_h = int(50 * scale)
         gap = int(80 * scale) if is_fullscreen else int(25 * scale)
 
-        # 1. Slider Volumen
+        # Slider
         runSettingsMenu.slider_width = int(WIDTH * 0.4)
         runSettingsMenu.slider_x = center_x - runSettingsMenu.slider_width // 2
         runSettingsMenu.slider_y = start_y + 20
         runSettingsMenu.slider_hitbox = pygame.Rect(runSettingsMenu.slider_x, runSettingsMenu.slider_y - 20, 
                                                    runSettingsMenu.slider_width, 40)
 
-        # Cargar datos
+        # Datos
         data = repo.get_settings("game_settings")
         if data:
             runSettingsMenu.volume = data["data"]["volume"]
@@ -55,7 +54,7 @@ def runSettingsMenu(screen, events, bg):
             runSettingsMenu.difficulty = "Easy"
             runSettingsMenu.fullscreen = False
 
-        # Creación de Botones (Iguales a Guardar/Atras)
+        # Botones
         diff_y = runSettingsMenu.slider_y + row_height
         runSettingsMenu.easyBtn = Button("Easy", btn_w, btn_h, (center_x - btn_w - (gap//2), diff_y), runSettingsMenu.button_font)
         runSettingsMenu.hardBtn = Button("Hard", btn_w, btn_h, (center_x + (gap//2), diff_y), runSettingsMenu.button_font)
@@ -64,7 +63,6 @@ def runSettingsMenu(screen, events, bg):
         runSettingsMenu.onBtn = Button("ON", btn_w, btn_h, (center_x - btn_w - (gap//2), fs_y), runSettingsMenu.button_font)
         runSettingsMenu.offBtn = Button("OFF", btn_w, btn_h, (center_x + (gap//2), fs_y), runSettingsMenu.button_font)
 
-        # Botones Acción
         action_y = fs_y + row_height + int(35 * scale)
         shift_right = int(60 * scale)
         runSettingsMenu.saveButton = Button("Guardar", btn_w, btn_h, (center_x + shift_right - btn_w - (gap//4), action_y), runSettingsMenu.button_font)
@@ -78,12 +76,11 @@ def runSettingsMenu(screen, events, bg):
 
         runSettingsMenu.action = None
 
-    # --- RENDERIZADO ---
     mouse_pos = pygame.mouse.get_pos()
     center_x = WIDTH // 2
     screen.blit(bg, (0, 0))
 
-    # Panel fondo
+    # Panel
     panel_surf = pygame.Surface((runSettingsMenu.panel_rect.width, runSettingsMenu.panel_rect.height))
     panel_surf.set_alpha(195)
     panel_surf.fill((10, 5, 25))
@@ -93,11 +90,12 @@ def runSettingsMenu(screen, events, bg):
     title_text = runSettingsMenu.title_font.render("Opciones", True, (210, 15, 240))
     screen.blit(title_text, title_text.get_rect(center=(center_x, runSettingsMenu.panel_rect.top + 50)))
 
-    # Slider Volumen
+    # Slider
     pygame.draw.rect(screen, (60, 60, 80), (runSettingsMenu.slider_x, runSettingsMenu.slider_y, runSettingsMenu.slider_width, 8), border_radius=4)
     vol_w = (runSettingsMenu.volume / 100) * runSettingsMenu.slider_width
     pygame.draw.rect(screen, (0, 255, 200), (runSettingsMenu.slider_x, runSettingsMenu.slider_y, vol_w, 8), border_radius=4)
     pygame.draw.circle(screen, (255, 255, 255), (int(runSettingsMenu.slider_x + vol_w), runSettingsMenu.slider_y + 4), 10)
+
     vol_lbl = runSettingsMenu.label_font.render(f"Volumen: {runSettingsMenu.volume}", True, (200, 200, 200))
     screen.blit(vol_lbl, (runSettingsMenu.slider_x, runSettingsMenu.slider_y - 30))
 
@@ -109,10 +107,17 @@ def runSettingsMenu(screen, events, bg):
     # Etiquetas
     diff_lbl = runSettingsMenu.label_font.render("Dificultad", True, (200, 200, 200))
     screen.blit(diff_lbl, (runSettingsMenu.easyBtn.rect.x, runSettingsMenu.easyBtn.rect.y - 25))
+
     fs_lbl = runSettingsMenu.label_font.render("Pantalla Fullscreen", True, (200, 200, 200))
     screen.blit(fs_lbl, (runSettingsMenu.onBtn.rect.x, runSettingsMenu.onBtn.rect.y - 25))
 
-    # Dibujar todos los botones
+    for btn in [runSettingsMenu.easyBtn, runSettingsMenu.hardBtn, runSettingsMenu.onBtn, runSettingsMenu.offBtn]:
+        if hasattr(btn, "base_color"):
+            btn.base_color = (60, 60, 80)
+        if hasattr(btn, "hover_color"):
+            btn.hover_color = (90, 90, 110)
+
+    # Dibujar botones
     runSettingsMenu.easyBtn.draw(screen)
     runSettingsMenu.hardBtn.draw(screen)
     runSettingsMenu.onBtn.draw(screen)
@@ -120,24 +125,21 @@ def runSettingsMenu(screen, events, bg):
     runSettingsMenu.saveButton.draw(screen)
     runSettingsMenu.backButton.draw(screen)
 
-    # --- INDICADOR DE SELECCIÓN (OSCURECIDO SIN VERDE) ---
-    # Superficie para el efecto oscuro
+    # OVERLAY OSCURO
     overlay = pygame.Surface((runSettingsMenu.easyBtn.rect.width, runSettingsMenu.easyBtn.rect.height), pygame.SRCALPHA)
-    overlay.fill((0, 0, 0, 100)) # Un poco más oscuro para que se note mejor
+    overlay.fill((0, 0, 0, 140))
 
-    # Dificultad
     if runSettingsMenu.difficulty == "Easy":
         screen.blit(overlay, runSettingsMenu.easyBtn.rect.topleft)
     else:
         screen.blit(overlay, runSettingsMenu.hardBtn.rect.topleft)
 
-    # Fullscreen
     if runSettingsMenu.fullscreen:
         screen.blit(overlay, runSettingsMenu.onBtn.rect.topleft)
     else:
         screen.blit(overlay, runSettingsMenu.offBtn.rect.topleft)
 
-    # --- EVENTOS ---
+    # Eventos
     for event in events:
         if event.type == pygame.QUIT: return 0
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -155,10 +157,12 @@ def runSettingsMenu(screen, events, bg):
 
     if runSettingsMenu.action == "save" and runSettingsMenu.saveButton.is_ready():
         repo.save_settings("game_settings", runSettingsMenu.volume, runSettingsMenu.difficulty, runSettingsMenu.fullscreen)
+
         if runSettingsMenu.fullscreen:
             screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
         else:
             screen = pygame.display.set_mode((800, 600))
+
         bg = pygame.transform.scale(bg, screen.get_size())
         runSettingsMenu.initialized = False
         runSettingsMenu.action = None
