@@ -28,8 +28,8 @@ def runSettingsMenu(screen, events, bg):
         runSettingsMenu.title_font = pygame.font.Font("assets/fonts/Orbitron-Bold.ttf", title_size)
         runSettingsMenu.button_font = pygame.font.Font("assets/fonts/Orbitron-Regular.ttf", button_size)
 
-        # 🔥 Layout en bloque centrado
-        spacing = int(60 * scale)
+
+        spacing = int(90 * scale)
 
         start_y = center_y - spacing * 2
 
@@ -85,7 +85,7 @@ def runSettingsMenu(screen, events, bg):
     center_x = WIDTH // 2
     center_y = HEIGHT // 2
 
-    # 🔥 Panel centrado correcto
+    # Panel centrado correcto
     panel = pygame.Surface(runSettingsMenu.panel_size)
     panel.set_alpha(120)
     panel.fill((10, 10, 30))
