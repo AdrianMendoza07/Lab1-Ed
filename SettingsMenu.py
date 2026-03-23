@@ -64,7 +64,7 @@ def runSettingsMenu(screen, events, bg):
         runSettingsMenu.onBtn = Button("ON", btn_w, btn_h, (center_x - btn_w - (gap//2), fs_y), runSettingsMenu.button_font)
         runSettingsMenu.offBtn = Button("OFF", btn_w, btn_h, (center_x + (gap//2), fs_y), runSettingsMenu.button_font)
 
-        # Botones de Acción (Guardar/Atras)
+        # Botones Acción
         action_y = fs_y + row_height + int(35 * scale)
         shift_right = int(60 * scale)
         runSettingsMenu.saveButton = Button("Guardar", btn_w, btn_h, (center_x + shift_right - btn_w - (gap//4), action_y), runSettingsMenu.button_font)
@@ -93,7 +93,7 @@ def runSettingsMenu(screen, events, bg):
     title_text = runSettingsMenu.title_font.render("Opciones", True, (210, 15, 240))
     screen.blit(title_text, title_text.get_rect(center=(center_x, runSettingsMenu.panel_rect.top + 50)))
 
-    # Slider Volumen
+    # Slider
     pygame.draw.rect(screen, (60, 60, 80), (runSettingsMenu.slider_x, runSettingsMenu.slider_y, runSettingsMenu.slider_width, 8), border_radius=4)
     vol_w = (runSettingsMenu.volume / 100) * runSettingsMenu.slider_width
     pygame.draw.rect(screen, (0, 255, 200), (runSettingsMenu.slider_x, runSettingsMenu.slider_y, vol_w, 8), border_radius=4)
@@ -102,9 +102,8 @@ def runSettingsMenu(screen, events, bg):
     screen.blit(vol_lbl, (runSettingsMenu.slider_x, runSettingsMenu.slider_y - 30))
 
     # Actualizar botones
-    buttons_list = [runSettingsMenu.easyBtn, runSettingsMenu.hardBtn, runSettingsMenu.onBtn, 
-                    runSettingsMenu.offBtn, runSettingsMenu.saveButton, runSettingsMenu.backButton]
-    for btn in buttons_list:
+    for btn in [runSettingsMenu.easyBtn, runSettingsMenu.hardBtn, runSettingsMenu.onBtn, 
+                runSettingsMenu.offBtn, runSettingsMenu.saveButton, runSettingsMenu.backButton]:
         btn.update(mouse_pos)
 
     # Etiquetas
@@ -113,7 +112,7 @@ def runSettingsMenu(screen, events, bg):
     fs_lbl = runSettingsMenu.label_font.render("Pantalla Fullscreen", True, (200, 200, 200))
     screen.blit(fs_lbl, (runSettingsMenu.onBtn.rect.x, runSettingsMenu.onBtn.rect.y - 25))
 
-    # DIBUJAR BOTONES Y MARCADOR DE SELECCIÓN
+    # Dibujar todos los botones
     runSettingsMenu.easyBtn.draw(screen)
     runSettingsMenu.hardBtn.draw(screen)
     runSettingsMenu.onBtn.draw(screen)
@@ -121,9 +120,10 @@ def runSettingsMenu(screen, events, bg):
     runSettingsMenu.saveButton.draw(screen)
     runSettingsMenu.backButton.draw(screen)
 
-
-    overlay = pygame.Surface((btn_w, btn_h), pygame.SRCALPHA)
-    overlay.fill((0, 0, 0, 120)) 
+    # --- INDICADOR DE SELECCIÓN (OSCURECIDO) ---
+    # Usamos las medidas directamente del botón para evitar el UnboundLocalError
+    overlay = pygame.Surface((runSettingsMenu.easyBtn.rect.width, runSettingsMenu.easyBtn.rect.height), pygame.SRCALPHA)
+    overlay.fill((0, 0, 0, 130)) # Un poco más oscuro para que se note mejor
 
     # Dificultad
     if runSettingsMenu.difficulty == "Easy":
