@@ -69,10 +69,10 @@ def runSettingsMenu(screen, events, bg, bg_original):
 
         fs_y = diff_y + row_height
         runSettingsMenu.onBtn = Button("ON", btn_w, btn_h,
-            (center_x - (btn_w // 2) - (gap // 2), fs_y),
+            (center_x - (btn_w // 2) - (gap // 2), fs_y + 10),  # movido un poco hacia abajo
             runSettingsMenu.button_font)
         runSettingsMenu.offBtn = Button("OFF", btn_w, btn_h,
-            (center_x + (btn_w // 2) + (gap // 2), fs_y),
+            (center_x + (btn_w // 2) + (gap // 2), fs_y + 10),  # movido un poco hacia abajo
             runSettingsMenu.button_font)
 
         action_y = fs_y + row_height + int(35 * scale)
@@ -149,16 +149,12 @@ def runSettingsMenu(screen, events, bg, bg_original):
         (int(runSettingsMenu.slider_x + vol_w),
          runSettingsMenu.slider_y + 4), 10)
 
-    # -------------------------
     # Texto Volumen
-    # -------------------------
     vol_lbl = runSettingsMenu.label_font.render(
         f"Volumen: {runSettingsMenu.volume}", True, (200, 200, 200))
     screen.blit(vol_lbl, (runSettingsMenu.slider_x, runSettingsMenu.slider_y - 30))
 
-    # -------------------------
     # Etiqueta "Dificultad"
-    # -------------------------
     diff_label = runSettingsMenu.label_font.render("Dificultad", True, (200, 200, 200))
     diff_label_rect = diff_label.get_rect(center=(
         WIDTH // 2,
@@ -166,13 +162,11 @@ def runSettingsMenu(screen, events, bg, bg_original):
     ))
     screen.blit(diff_label, diff_label_rect)
 
-    # -------------------------
-    # Etiqueta "Fullscreen"
-    # -------------------------
+    # Etiqueta "Fullscreen" 
     fs_label = runSettingsMenu.label_font.render("Fullscreen", True, (200, 200, 200))
     fs_label_rect = fs_label.get_rect(center=(
         WIDTH // 2,
-        runSettingsMenu.onBtn.rect.top - 20
+        runSettingsMenu.onBtn.rect.top - 10  
     ))
     screen.blit(fs_label, fs_label_rect)
 
