@@ -1,3 +1,5 @@
+from UsersMenu import runUsersMenu
+from newUsersMenu import runNewUsersMenu
 import pygame
 from StartMenu import runStartMenu
 from SettingsMenu import runSettingsMenu
@@ -44,9 +46,8 @@ while running:
 
     # Menú principal
     if state == 1:
-        state = runStartMenu(screen, events, bg)        
-
-    # Menú de configuración
+        state = runStartMenu(screen, events, bg)   
+    #Menu de Configuracion
     if state == 2:
         state = runSettingsMenu(screen, events, bg)   
 
@@ -55,6 +56,15 @@ while running:
         state = runLeaderboardMenu(screen, events, bg)
         
     # Control de FPS (60 cuadros por segundo)
+    if state == 3:
+        state = runUsersMenu(screen, events, bg)  
+
+    if state == 4:
+        state = runNewUsersMenu(screen, events, bg)    
+        if state == 3:  # coming back to users menu
+            if hasattr(runUsersMenu, "initialized"):
+                del runUsersMenu.initialized
+    
     clock.tick(60)    
         
 # Finalización de pygame y liberación de recursos
