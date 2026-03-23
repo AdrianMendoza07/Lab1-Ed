@@ -17,26 +17,24 @@ def runSettingsMenu(screen, events, bg):
         center_x = WIDTH // 2
         center_y = HEIGHT // 2
         
-        # Escala un poco más generosa para evitar que se amontonen
         scale = 1.0 if is_fullscreen else 0.8
 
         # Fuentes
         title_size = int(HEIGHT * 0.08 * scale)
-        label_size = int(HEIGHT * 0.025 * scale) # Para los textos "Dificultad", etc.
+        label_size = int(HEIGHT * 0.025 * scale)
         button_font_size = int(HEIGHT * 0.03 * scale)
         
         runSettingsMenu.title_font = pygame.font.Font("assets/fonts/Orbitron-Bold.ttf", title_size)
         runSettingsMenu.label_font = pygame.font.Font("assets/fonts/Orbitron-Regular.ttf", label_size)
         runSettingsMenu.button_font = pygame.font.Font("assets/fonts/Orbitron-Regular.ttf", button_font_size)
 
-        # Aumentamos el row_height para que no se pisen los textos
         row_height = int(95 * scale) 
         start_y = center_y - (row_height * 1.5)
 
         # Botones medidas
         btn_w = int(140 * scale)
         btn_h = int(50 * scale)
-        gap = 20 # Espacio entre botones horizontales
+        gap = 20 
 
         # 1. Slider de Volumen
         runSettingsMenu.slider_width = int(WIDTH * 0.4)
@@ -45,29 +43,31 @@ def runSettingsMenu(screen, events, bg):
         runSettingsMenu.slider_hitbox = pygame.Rect(runSettingsMenu.slider_x, runSettingsMenu.slider_y - 20, 
                                                    runSettingsMenu.slider_width, 40)
 
-        # 2. Dificultad (Centrado real)
+        # 2. Dificultad 
         diff_y = start_y + row_height + 15
         runSettingsMenu.easy_rect = pygame.Rect(center_x - btn_w - (gap//2), diff_y, btn_w, btn_h)
         runSettingsMenu.hard_rect = pygame.Rect(center_x + (gap//2), diff_y, btn_w, btn_h)
 
-        # 3. Fullscreen (Centrado real)
+        # 3. Fullscreen 
         fs_y = diff_y + row_height
         runSettingsMenu.fs_on_rect = pygame.Rect(center_x - btn_w - (gap//2), fs_y, btn_w, btn_h)
         runSettingsMenu.fs_off_rect = pygame.Rect(center_x + (gap//2), fs_y, btn_w, btn_h)
 
-        # 4. Botones Guardar / Atrás (Alineados al centro)
-        action_y = fs_y + row_height + 10
-        # Restamos la mitad del ancho total del par de botones para que el centro sea el centro
+        # 4. Botones Guardar / Atrás 
+        action_y = fs_y + row_height + 15
+        offset_derecha = int(60 * scale) 
+        
         runSettingsMenu.saveButton = Button("Guardar", btn_w, btn_h,
-                                            (center_x - btn_w - (gap//2), action_y),
+                                            (center_x + offset_derecha, action_y),
                                             runSettingsMenu.button_font)
+        
         runSettingsMenu.backButton = Button("Atras", btn_w, btn_h,
-                                            (center_x + (gap//2), action_y),
+                                            (center_x + offset_derecha + btn_w + gap, action_y),
                                             runSettingsMenu.button_font)
 
-        # Panel más grande para que respire el diseño
-        panel_w = int(runSettingsMenu.slider_width + 100)
-        panel_h = int(HEIGHT * 0.7)
+        # Panel
+        panel_w = int(runSettingsMenu.slider_width + 200) 
+        panel_h = int(HEIGHT * 0.75)
         runSettingsMenu.panel_rect = pygame.Rect(0, 0, panel_w, panel_h)
         runSettingsMenu.panel_rect.center = (center_x, center_y)
 
@@ -88,7 +88,7 @@ def runSettingsMenu(screen, events, bg):
     screen.blit(bg, (0, 0))
     center_x = WIDTH // 2
 
-    # Panel
+    # Panel fondo
     panel_surf = pygame.Surface((runSettingsMenu.panel_rect.width, runSettingsMenu.panel_rect.height))
     panel_surf.set_alpha(180)
     panel_surf.fill((15, 5, 30))
@@ -116,7 +116,6 @@ def runSettingsMenu(screen, events, bg):
     pygame.draw.rect(screen, e_col, runSettingsMenu.easy_rect, border_radius=10)
     pygame.draw.rect(screen, h_col, runSettingsMenu.hard_rect, border_radius=10)
     
-    # Texto de botones centrado manualmente dentro del rect
     screen.blit(runSettingsMenu.button_font.render("Easy", True, (255,255,255)), runSettingsMenu.easy_rect.move(30, 10))
     screen.blit(runSettingsMenu.button_font.render("Hard", True, (255,255,255)), runSettingsMenu.hard_rect.move(30, 10))
 
@@ -132,7 +131,7 @@ def runSettingsMenu(screen, events, bg):
     screen.blit(runSettingsMenu.button_font.render("ON", True, (255,255,255)), runSettingsMenu.fs_on_rect.move(40, 10))
     screen.blit(runSettingsMenu.button_font.render("OFF", True, (255,255,255)), runSettingsMenu.fs_off_rect.move(35, 10))
 
-    # Botones Guardar/Atras
+    # Dibujar Botones de acción
     runSettingsMenu.saveButton.update(mouse_pos)
     runSettingsMenu.backButton.update(mouse_pos)
     runSettingsMenu.saveButton.draw(screen)
