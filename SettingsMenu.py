@@ -55,7 +55,7 @@ def runSettingsMenu(screen, events, bg):
             runSettingsMenu.difficulty = "Easy"
             runSettingsMenu.fullscreen = False
 
-        # Creación de Botones
+        # Creación de Botones (Iguales a Guardar/Atras)
         diff_y = runSettingsMenu.slider_y + row_height
         runSettingsMenu.easyBtn = Button("Easy", btn_w, btn_h, (center_x - btn_w - (gap//2), diff_y), runSettingsMenu.button_font)
         runSettingsMenu.hardBtn = Button("Hard", btn_w, btn_h, (center_x + (gap//2), diff_y), runSettingsMenu.button_font)
@@ -93,7 +93,7 @@ def runSettingsMenu(screen, events, bg):
     title_text = runSettingsMenu.title_font.render("Opciones", True, (210, 15, 240))
     screen.blit(title_text, title_text.get_rect(center=(center_x, runSettingsMenu.panel_rect.top + 50)))
 
-    # Slider
+    # Slider Volumen
     pygame.draw.rect(screen, (60, 60, 80), (runSettingsMenu.slider_x, runSettingsMenu.slider_y, runSettingsMenu.slider_width, 8), border_radius=4)
     vol_w = (runSettingsMenu.volume / 100) * runSettingsMenu.slider_width
     pygame.draw.rect(screen, (0, 255, 200), (runSettingsMenu.slider_x, runSettingsMenu.slider_y, vol_w, 8), border_radius=4)
@@ -120,10 +120,10 @@ def runSettingsMenu(screen, events, bg):
     runSettingsMenu.saveButton.draw(screen)
     runSettingsMenu.backButton.draw(screen)
 
-    # --- INDICADOR DE SELECCIÓN (OSCURECIDO) ---
-    # Usamos las medidas directamente del botón para evitar el UnboundLocalError
+    # --- INDICADOR DE SELECCIÓN (OSCURECIDO SIN VERDE) ---
+    # Superficie para el efecto oscuro
     overlay = pygame.Surface((runSettingsMenu.easyBtn.rect.width, runSettingsMenu.easyBtn.rect.height), pygame.SRCALPHA)
-    overlay.fill((0, 0, 0, 130)) # Un poco más oscuro para que se note mejor
+    overlay.fill((0, 0, 0, 100)) # Un poco más oscuro para que se note mejor
 
     # Dificultad
     if runSettingsMenu.difficulty == "Easy":
