@@ -1,4 +1,3 @@
-import json
 from Persistence.Hash_table import HashTable
 from Persistence.Storage.Record_store import RecordStore
 
@@ -12,17 +11,9 @@ class SettingsRepository:
 
     def save_settings(self, key, volume, difficulty, fullscreen):
         volume = max(0, min(100, volume))
-        data = {
-            "volume": volume,
-            "difficulty": difficulty,
-            "fullscreen": fullscreen
-        }
 
-        record = json.dumps({
-            "type": "settings",
-            "key": key,
-            "data": data
-        })
+        # Formato CSV
+        record = f"settings,{key},{volume},{difficulty},{fullscreen}\n"
 
         position = self.store.append(record)
         self.table.insert(key, position)
@@ -35,22 +26,33 @@ class SettingsRepository:
 
         with open("data.log", "r") as file:
             file.seek(position)
-            line = file.readline()
+            line = file.readline().strip()
 
-        return json.loads(line)
+        # Convertir CSV → diccionario
+        parts = line.split(",")
+
+        return {
+            "type": parts[0],
+            "key": parts[1],
+            "data": {
+                "volume": int(parts[2]),
+                "difficulty": parts[3],
+                "fullscreen": parts[4] == "True"
+            }
+        }
 
     def _rebuild_index(self):
         try:
             with open("data.log", "r") as file:
                 while True:
-                    offset = file.tell()   
+                    offset = file.tell()
 
                     line = file.readline()
                     if not line:
                         break
 
-                    record = json.loads(line)
-                    key = record["key"]
+                    parts = line.strip().split(",")
+                    key = parts[1]
 
                     self.table.insert(key, offset)
 
