@@ -18,7 +18,8 @@ class Button:
         self.is_pressed = False
         self.press_time = 0
         self.delay = 150
-
+        
+        
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             if self.rect.collidepoint(event.pos):
@@ -44,6 +45,7 @@ class Button:
             if not self.rect.collidepoint(mouse_pos):
                 self.currentColor = self.baseColor
 
+    # Click termina
     def is_ready(self):
         return True 
 
