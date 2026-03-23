@@ -165,11 +165,12 @@ def runSettingsMenu(screen, events, bg, bg_original):
     screen.blit(diff_label, diff_label_rect)
 
     # Etiqueta "Fullscreen"
+    fs_offset = -15 if is_fullscreen else 0  
     fs_label = runSettingsMenu.label_font.render("Fullscreen", True, (200, 200, 200))
     fs_label_rect = fs_label.get_rect(center=(
         WIDTH // 2,
-        runSettingsMenu.onBtn.rect.top - 10
-    ))
+        runSettingsMenu.onBtn.rect.top - 10 + fs_offset  
+        ))
     screen.blit(fs_label, fs_label_rect)
 
     # Botones
