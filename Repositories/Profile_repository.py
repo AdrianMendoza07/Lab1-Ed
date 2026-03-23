@@ -15,12 +15,14 @@ class ProfileRepository:
 
     def get_profile(self, player_id):
         position = self.table.search(player_id)
-        if position == -1:
+
+        if position is None or position == -1:
             return None
-        file = open("data.log", "r")
-        file.seek(position)
-        line = file.readline()
-        file.close()
+
+        with open("data.log", "r") as file:
+            file.seek(position)
+            line = file.readline()
+
         return line
     
     def get_next_id(self):
