@@ -32,7 +32,7 @@ def runSettingsMenu(screen, events, bg):
         row_height = int(95 * scale) if is_fullscreen else int(80 * scale)
         start_y = center_y - (row_height * 2.0) if is_fullscreen else center_y - (row_height * 2.2)
 
-
+        # Medidas comunes
         btn_w = int(140 * scale)
         btn_h = int(50 * scale)
         gap = int(80 * scale) if is_fullscreen else int(25 * scale)
@@ -44,7 +44,7 @@ def runSettingsMenu(screen, events, bg):
         runSettingsMenu.slider_hitbox = pygame.Rect(runSettingsMenu.slider_x, runSettingsMenu.slider_y - 20, 
                                                    runSettingsMenu.slider_width, 40)
 
-        # Cargar datos para inicializar estados de botones
+        # Cargar datos
         data = repo.get_settings("game_settings")
         if data:
             runSettingsMenu.volume = data["data"]["volume"]
@@ -55,17 +55,15 @@ def runSettingsMenu(screen, events, bg):
             runSettingsMenu.difficulty = "Easy"
             runSettingsMenu.fullscreen = False
 
-        # Dificultad
+        # Creación de Botones 
         diff_y = runSettingsMenu.slider_y + row_height
         runSettingsMenu.easyBtn = Button("Easy", btn_w, btn_h, (center_x - btn_w - (gap//2), diff_y), runSettingsMenu.button_font)
         runSettingsMenu.hardBtn = Button("Hard", btn_w, btn_h, (center_x + (gap//2), diff_y), runSettingsMenu.button_font)
 
-        # Fullscreen
         fs_y = diff_y + row_height
         runSettingsMenu.onBtn = Button("ON", btn_w, btn_h, (center_x - btn_w - (gap//2), fs_y), runSettingsMenu.button_font)
         runSettingsMenu.offBtn = Button("OFF", btn_w, btn_h, (center_x + (gap//2), fs_y), runSettingsMenu.button_font)
 
-        # Acción (Guardar/Atrás) 
         action_y = fs_y + row_height + int(35 * scale)
         shift_right = int(60 * scale)
         runSettingsMenu.saveButton = Button("Guardar", btn_w, btn_h, (center_x + shift_right - btn_w - (gap//4), action_y), runSettingsMenu.button_font)
@@ -81,6 +79,7 @@ def runSettingsMenu(screen, events, bg):
 
     # --- RENDERIZADO ---
     mouse_pos = pygame.mouse.get_pos()
+    center_x = WIDTH // 2  
     screen.blit(bg, (0, 0))
 
     # Panel fondo
@@ -101,7 +100,7 @@ def runSettingsMenu(screen, events, bg):
     vol_lbl = runSettingsMenu.label_font.render(f"Volumen: {runSettingsMenu.volume}", True, (200, 200, 200))
     screen.blit(vol_lbl, (runSettingsMenu.slider_x, runSettingsMenu.slider_y - 30))
 
-    # DIBUJAR BOTONES
+    # Actualizar botones
     for btn in [runSettingsMenu.easyBtn, runSettingsMenu.hardBtn, runSettingsMenu.onBtn, 
                 runSettingsMenu.offBtn, runSettingsMenu.saveButton, runSettingsMenu.backButton]:
         btn.update(mouse_pos)
@@ -109,33 +108,27 @@ def runSettingsMenu(screen, events, bg):
     # Etiquetas
     diff_lbl = runSettingsMenu.label_font.render("Dificultad", True, (200, 200, 200))
     screen.blit(diff_lbl, (runSettingsMenu.easyBtn.rect.x, runSettingsMenu.easyBtn.rect.y - 25))
-    
     fs_lbl = runSettingsMenu.label_font.render("Pantalla Fullscreen", True, (200, 200, 200))
     screen.blit(fs_lbl, (runSettingsMenu.onBtn.rect.x, runSettingsMenu.onBtn.rect.y - 25))
 
-    # Dibujar Dificultad
+    # Dibujar Dificultad e indicador de seleccionado
     runSettingsMenu.easyBtn.draw(screen)
     runSettingsMenu.hardBtn.draw(screen)
-    if runSettingsMenu.difficulty == "Easy":
-        s = pygame.Surface((runSettingsMenu.easyBtn.rect.width, runSettingsMenu.easyBtn.rect.height), pygame.SRCALPHA)
-        s.fill((0, 0, 0, 80)) 
-        screen.blit(s, runSettingsMenu.easyBtn.rect.topleft)
-    else:
-        s = pygame.Surface((runSettingsMenu.hardBtn.rect.width, runSettingsMenu.hardBtn.rect.height), pygame.SRCALPHA)
-        s.fill((0, 0, 0, 80))
-        screen.blit(s, runSettingsMenu.hardBtn.rect.topleft)
+    
 
-    # Dibujar Fullscreen
+    selected_rect = runSettingsMenu.easyBtn.rect if runSettingsMenu.difficulty == "Easy" else runSettingsMenu.hardBtn.rect
+    s = pygame.Surface((selected_rect.width, selected_rect.height), pygame.SRCALPHA)
+    s.fill((0, 0, 0, 100)) 
+    screen.blit(s, selected_rect.topleft)
+
+    # Dibujar Fullscreen e indicador
     runSettingsMenu.onBtn.draw(screen)
     runSettingsMenu.offBtn.draw(screen)
-    if runSettingsMenu.fullscreen:
-        s = pygame.Surface((runSettingsMenu.onBtn.rect.width, runSettingsMenu.onBtn.rect.height), pygame.SRCALPHA)
-        s.fill((0, 0, 0, 80))
-        screen.blit(s, runSettingsMenu.onBtn.rect.topleft)
-    else:
-        s = pygame.Surface((runSettingsMenu.offBtn.rect.width, runSettingsMenu.offBtn.rect.height), pygame.SRCALPHA)
-        s.fill((0, 0, 0, 80))
-        screen.blit(s, runSettingsMenu.offBtn.rect.topleft)
+    
+    fs_selected_rect = runSettingsMenu.onBtn.rect if runSettingsMenu.fullscreen else runSettingsMenu.offBtn.rect
+    s_fs = pygame.Surface((fs_selected_rect.width, fs_selected_rect.height), pygame.SRCALPHA)
+    s_fs.fill((0, 0, 0, 100))
+    screen.blit(s_fs, fs_selected_rect.topleft)
 
     # Botones Acción
     runSettingsMenu.saveButton.draw(screen)
@@ -159,7 +152,10 @@ def runSettingsMenu(screen, events, bg):
 
     if runSettingsMenu.action == "save" and runSettingsMenu.saveButton.is_ready():
         repo.save_settings("game_settings", runSettingsMenu.volume, runSettingsMenu.difficulty, runSettingsMenu.fullscreen)
-        screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN) if runSettingsMenu.fullscreen else pygame.display.set_mode((800, 600))
+        if runSettingsMenu.fullscreen:
+            screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+        else:
+            screen = pygame.display.set_mode((800, 600))
         bg = pygame.transform.scale(bg, screen.get_size())
         runSettingsMenu.initialized = False
         runSettingsMenu.action = None
