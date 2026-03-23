@@ -54,7 +54,7 @@ def runSettingsMenu(screen, events, bg):
             runSettingsMenu.difficulty = "Easy"
             runSettingsMenu.fullscreen = False
 
-        # CREACIÓN DE BOTONES
+        # Creación de Botones
         diff_y = runSettingsMenu.slider_y + row_height
         runSettingsMenu.easyBtn = Button("Easy", btn_w, btn_h, (center_x - btn_w - (gap//2), diff_y), runSettingsMenu.button_font)
         runSettingsMenu.hardBtn = Button("Hard", btn_w, btn_h, (center_x + (gap//2), diff_y), runSettingsMenu.button_font)
@@ -68,20 +68,17 @@ def runSettingsMenu(screen, events, bg):
         runSettingsMenu.saveButton = Button("Guardar", btn_w, btn_h, (center_x + shift_right - btn_w - (gap//4), action_y), runSettingsMenu.button_font)
         runSettingsMenu.backButton = Button("Atras", btn_w, btn_h, (center_x + shift_right + (gap//4), action_y), runSettingsMenu.button_font)
 
-        # Panel
-        panel_w = int(runSettingsMenu.slider_width + (180 if is_fullscreen else 120))
-        panel_h = int(HEIGHT * 0.75) 
-        runSettingsMenu.panel_rect = pygame.Rect(0, 0, panel_w, panel_h)
+        runSettingsMenu.panel_rect = pygame.Rect(0, 0, int(runSettingsMenu.slider_width + (180 if is_fullscreen else 120)), int(HEIGHT * 0.75))
         runSettingsMenu.panel_rect.center = (center_x, center_y)
 
         runSettingsMenu.action = None
 
-
+    # RENDERIZADO
     mouse_pos = pygame.mouse.get_pos()
     center_x = WIDTH // 2
     screen.blit(bg, (0, 0))
 
-    # Dibujar Panel
+    # Panel
     panel_surf = pygame.Surface((runSettingsMenu.panel_rect.width, runSettingsMenu.panel_rect.height))
     panel_surf.set_alpha(195)
     panel_surf.fill((10, 5, 25))
@@ -99,6 +96,7 @@ def runSettingsMenu(screen, events, bg):
     vol_lbl = runSettingsMenu.label_font.render(f"Volumen: {runSettingsMenu.volume}", True, (200, 200, 200))
     screen.blit(vol_lbl, (runSettingsMenu.slider_x, runSettingsMenu.slider_y - 30))
 
+
     all_buttons = [runSettingsMenu.easyBtn, runSettingsMenu.hardBtn, runSettingsMenu.onBtn, 
                    runSettingsMenu.offBtn, runSettingsMenu.saveButton, runSettingsMenu.backButton]
     
@@ -106,7 +104,6 @@ def runSettingsMenu(screen, events, bg):
         btn.update(mouse_pos)
         if hasattr(btn, "base_color"): btn.base_color = (60, 60, 80)
         if hasattr(btn, "hover_color"): btn.hover_color = (90, 90, 110)
-        if hasattr(btn, "clicked_color"): btn.clicked_color = (60, 60, 80) 
 
     # Etiquetas
     diff_lbl = runSettingsMenu.label_font.render("Dificultad", True, (200, 200, 200))
@@ -114,12 +111,13 @@ def runSettingsMenu(screen, events, bg):
     fs_lbl = runSettingsMenu.label_font.render("Pantalla Fullscreen", True, (200, 200, 200))
     screen.blit(fs_lbl, (runSettingsMenu.onBtn.rect.x, runSettingsMenu.onBtn.rect.y - 25))
 
+    # Dibujar botones
     for btn in all_buttons:
         btn.draw(screen)
 
-
+    # INDICADOR DE SELECCIÓN 
     overlay = pygame.Surface((runSettingsMenu.easyBtn.rect.width, runSettingsMenu.easyBtn.rect.height), pygame.SRCALPHA)
-    overlay.fill((0, 0, 0, 160)) 
+    overlay.fill((0, 0, 0, 140)) 
 
     if runSettingsMenu.difficulty == "Easy":
         screen.blit(overlay, runSettingsMenu.easyBtn.rect.topleft)
@@ -140,6 +138,7 @@ def runSettingsMenu(screen, events, bg):
                 rel_x = mx - runSettingsMenu.slider_x
                 runSettingsMenu.volume = max(0, min(100, int((rel_x / runSettingsMenu.slider_width) * 100)))
         
+        # Al presionar, el botón cambiará a su color de click (verde) y luego volverá al base
         if runSettingsMenu.easyBtn.handle_event(event): runSettingsMenu.difficulty = "Easy"
         if runSettingsMenu.hardBtn.handle_event(event): runSettingsMenu.difficulty = "Hard"
         if runSettingsMenu.onBtn.handle_event(event): runSettingsMenu.fullscreen = True
