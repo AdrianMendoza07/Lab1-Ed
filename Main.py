@@ -31,12 +31,12 @@ while running:
     if state == 2:
         state = runSettingsMenu(screen, events, bg)   
         
-    if state == 3:
+    if state == 4:
         state = runUsersMenu(screen, events, bg)  
 
-    if state == 4:
+    if state == 5:
         state = runNewUsersMenu(screen, events, bg)    
-        if state == 3:  # coming back to users menu
+        if state == 4:  # coming back to users menu
             if hasattr(runUsersMenu, "initialized"):
                 del runUsersMenu.initialized
     

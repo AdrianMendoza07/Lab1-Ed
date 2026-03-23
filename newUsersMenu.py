@@ -86,10 +86,10 @@ def runNewUsersMenu(screen, events, bg):
     
     if runNewUsersMenu.action == "back" and backButton.is_ready():
         runNewUsersMenu.action = None
-        return 3
+        return 4
     
     
     # Actualizar 
     pygame.display.flip()
     
-    return 4 
+    return 5
