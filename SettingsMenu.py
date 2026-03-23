@@ -12,7 +12,7 @@ def runSettingsMenu(screen, events, bg, bg_original):
         runSettingsMenu.initialized = False
         runSettingsMenu.last_size = (WIDTH, HEIGHT)
 
-    # INICIALIZACIÓN 
+    # ----------- INICIALIZACIÓN -----------
     if not hasattr(runSettingsMenu, "initialized") or not runSettingsMenu.initialized:
 
         is_fullscreen = screen.get_flags() & pygame.FULLSCREEN
@@ -149,32 +149,32 @@ def runSettingsMenu(screen, events, bg, bg_original):
         (int(runSettingsMenu.slider_x + vol_w),
          runSettingsMenu.slider_y + 4), 10)
 
-    # Texto volumen
+    # -------------------------
+    # Texto Volumen
+    # -------------------------
     vol_lbl = runSettingsMenu.label_font.render(
         f"Volumen: {runSettingsMenu.volume}", True, (200, 200, 200))
-    screen.blit(vol_lbl, (runSettingsMenu.slider_x,
-                          runSettingsMenu.slider_y - 30))
+    screen.blit(vol_lbl, (runSettingsMenu.slider_x, runSettingsMenu.slider_y - 30))
 
     # -------------------------
-    # Texto de dificultad y fullscreen
+    # Etiqueta "Dificultad"
     # -------------------------
-    diff_text = runSettingsMenu.label_font.render(
-        f"Dificultad: {runSettingsMenu.difficulty}", True, (200, 200, 200)
-    )
-    diff_text_rect = diff_text.get_rect(center=(
+    diff_label = runSettingsMenu.label_font.render("Dificultad", True, (200, 200, 200))
+    diff_label_rect = diff_label.get_rect(center=(
         WIDTH // 2,
-        runSettingsMenu.easyBtn.rect.top - 25
+        runSettingsMenu.easyBtn.rect.top - 20
     ))
-    screen.blit(diff_text, diff_text_rect)
+    screen.blit(diff_label, diff_label_rect)
 
-    fs_text = runSettingsMenu.label_font.render(
-        f"Fullscreen: {'ON' if runSettingsMenu.fullscreen else 'OFF'}", True, (200, 200, 200)
-    )
-    fs_text_rect = fs_text.get_rect(center=(
+    # -------------------------
+    # Etiqueta "Fullscreen"
+    # -------------------------
+    fs_label = runSettingsMenu.label_font.render("Fullscreen", True, (200, 200, 200))
+    fs_label_rect = fs_label.get_rect(center=(
         WIDTH // 2,
-        runSettingsMenu.onBtn.rect.top - 25
+        runSettingsMenu.onBtn.rect.top - 20
     ))
-    screen.blit(fs_text, fs_text_rect)
+    screen.blit(fs_label, fs_label_rect)
 
     # Botones
     buttons = [
