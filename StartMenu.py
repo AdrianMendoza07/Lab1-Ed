@@ -45,9 +45,6 @@ def runStartMenu(screen, events, bg):
         # Botones (centrados SIEMPRE)
         runStartMenu.startButton = Button("Nuevo Juego", button_width, button_height, (center_x, start_y), runStartMenu.button_font)
 
-        runStartMenu.usersButton = Button("Seleccion de Usuario", button_width, button_height,
-                                          (center_x, start_y + spacing), runStartMenu.button_font)
-
         runStartMenu.leaderboardButton = Button("Leaderboard", button_width, button_height,
                                                 (center_x, start_y + spacing*2), runStartMenu.button_font)
 
@@ -61,7 +58,6 @@ def runStartMenu(screen, events, bg):
 
     # Referencias rápidas
     startButton = runStartMenu.startButton
-    usersButton = runStartMenu.usersButton
     leaderboardButton = runStartMenu.leaderboardButton
     settingsButton = runStartMenu.settingsButton
     quitButton = runStartMenu.quitButton
@@ -75,14 +71,19 @@ def runStartMenu(screen, events, bg):
 
         if settingsButton.handle_event(event):
             runStartMenu.action = "settings"
+        
+        if leaderboardButton.handle_event(event):
+            runStartMenu.action = "leaderboard"
 
         if quitButton.handle_event(event):
             runStartMenu.action = "quit"
+        
+        if startButton.handle_event(event):
+            runStartMenu.action = "users"    
 
     mouse_pos = pygame.mouse.get_pos()
 
     startButton.update(mouse_pos)
-    usersButton.update(mouse_pos)
     leaderboardButton.update(mouse_pos)
     settingsButton.update(mouse_pos)
     quitButton.update(mouse_pos)
@@ -103,7 +104,6 @@ def runStartMenu(screen, events, bg):
 
     # Botones
     startButton.draw(screen)
-    usersButton.draw(screen)
     leaderboardButton.draw(screen)
     settingsButton.draw(screen)
     quitButton.draw(screen)
@@ -112,6 +112,11 @@ def runStartMenu(screen, events, bg):
     if runStartMenu.action == "settings" and settingsButton.is_ready():
         runStartMenu.action = None
         return 2
+    if runStartMenu.action == "leaderboard" and leaderboardButton.is_ready():
+        return 3
+    if runStartMenu.action == "users" and startButton.is_ready():
+        runStartMenu.action = None
+        return 4
 
     if runStartMenu.action == "quit" and quitButton.is_ready():
         return 0

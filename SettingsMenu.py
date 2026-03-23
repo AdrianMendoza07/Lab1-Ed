@@ -7,41 +7,45 @@ repo = SettingsRepository()
 def runSettingsMenu(screen, events, bg):
     WIDTH, HEIGHT = screen.get_size()
 
-    # INICIALIZACIÓN
+    # Detectar cambio de tamaño
     if not hasattr(runSettingsMenu, "last_size") or runSettingsMenu.last_size != (WIDTH, HEIGHT):
         runSettingsMenu.initialized = False
         runSettingsMenu.last_size = (WIDTH, HEIGHT)
 
-    if not hasattr(runSettingsMenu, "initialized") or runSettingsMenu.initialized == False:
-        runSettingsMenu.initialized = True
+    # ----------- INICIALIZACIÓN -----------
+    if not hasattr(runSettingsMenu, "initialized") or not runSettingsMenu.initialized:
+
         is_fullscreen = screen.get_flags() & pygame.FULLSCREEN
         center_x = WIDTH // 2
         center_y = HEIGHT // 2
-        
         scale = 1.0 if is_fullscreen else 0.8
 
-        # Configuración de Fuentes
+        # Fuentes
         title_size = int(HEIGHT * 0.08 * scale)
         label_size = int(HEIGHT * 0.025 * scale)
         button_font_size = int(HEIGHT * 0.03 * scale)
-        
+
         runSettingsMenu.title_font = pygame.font.Font("assets/fonts/Orbitron-Bold.ttf", title_size)
         runSettingsMenu.label_font = pygame.font.Font("assets/fonts/Orbitron-Regular.ttf", label_size)
         runSettingsMenu.button_font = pygame.font.Font("assets/fonts/Orbitron-Regular.ttf", button_font_size)
 
-        # Medidas y Espaciado 
+        # Layout
         row_height = int(95 * scale) if is_fullscreen else int(80 * scale)
-        start_y = center_y - (row_height * 2.0) if is_fullscreen else center_y - (row_height * 2.2)
-        
+        start_y = center_y - (row_height * 2.0)
+
         btn_w, btn_h = int(140 * scale), int(50 * scale)
         gap = int(80 * scale) if is_fullscreen else int(25 * scale)
 
-        # Slider de Volumen
+        # Slider
         runSettingsMenu.slider_width = int(WIDTH * 0.4)
         runSettingsMenu.slider_x = center_x - runSettingsMenu.slider_width // 2
         runSettingsMenu.slider_y = start_y + 20
-        runSettingsMenu.slider_hitbox = pygame.Rect(runSettingsMenu.slider_x, runSettingsMenu.slider_y - 20, 
-                                                   runSettingsMenu.slider_width, 40)
+        runSettingsMenu.slider_hitbox = pygame.Rect(
+            runSettingsMenu.slider_x,
+            runSettingsMenu.slider_y - 20,
+            runSettingsMenu.slider_width,
+            40
+        )
 
         # Datos
         data = repo.get_settings("game_settings")
@@ -54,98 +58,156 @@ def runSettingsMenu(screen, events, bg):
             runSettingsMenu.difficulty = "Easy"
             runSettingsMenu.fullscreen = False
 
-        # POSICIONAMIENTO DE BOTONES
-        # Fila Dificultad
+        # Botones
         diff_y = runSettingsMenu.slider_y + row_height
-        runSettingsMenu.easyBtn = Button("Easy", btn_w, btn_h, (center_x - (btn_w // 2) - (gap // 2), diff_y), runSettingsMenu.button_font)
-        runSettingsMenu.hardBtn = Button("Hard", btn_w, btn_h, (center_x + (btn_w // 2) + (gap // 2), diff_y), runSettingsMenu.button_font)
+        runSettingsMenu.easyBtn = Button("Easy", btn_w, btn_h,
+            (center_x - (btn_w // 2) - (gap // 2), diff_y),
+            runSettingsMenu.button_font)
 
-        # Fila Fullscreen
+        runSettingsMenu.hardBtn = Button("Hard", btn_w, btn_h,
+            (center_x + (btn_w // 2) + (gap // 2), diff_y),
+            runSettingsMenu.button_font)
+
         fs_y = diff_y + row_height
-        runSettingsMenu.onBtn = Button("ON", btn_w, btn_h, (center_x - (btn_w // 2) - (gap // 2), fs_y), runSettingsMenu.button_font)
-        runSettingsMenu.offBtn = Button("OFF", btn_w, btn_h, (center_x + (btn_w // 2) + (gap // 2), fs_y), runSettingsMenu.button_font)
+        runSettingsMenu.onBtn = Button("ON", btn_w, btn_h,
+            (center_x - (btn_w // 2) - (gap // 2), fs_y),
+            runSettingsMenu.button_font)
 
-        # Fila Acciones (Guardar / Atrás)
+        runSettingsMenu.offBtn = Button("OFF", btn_w, btn_h,
+            (center_x + (btn_w // 2) + (gap // 2), fs_y),
+            runSettingsMenu.button_font)
+
         action_y = fs_y + row_height + int(35 * scale)
-        runSettingsMenu.saveButton = Button("Guardar", btn_w, btn_h, (center_x - (btn_w // 2) - (gap // 4), action_y), runSettingsMenu.button_font)
-        runSettingsMenu.backButton = Button("Atras", btn_w, btn_h, (center_x + (btn_w // 2) + (gap // 4), action_y), runSettingsMenu.button_font)
+        runSettingsMenu.saveButton = Button("Guardar", btn_w, btn_h,
+            (center_x - (btn_w // 2) - (gap // 4), action_y),
+            runSettingsMenu.button_font)
 
-        # Panel de Fondo
+        runSettingsMenu.backButton = Button("Atras", btn_w, btn_h,
+            (center_x + (btn_w // 2) + (gap // 4), action_y),
+            runSettingsMenu.button_font)
+
+        # Panel
         panel_w = int(runSettingsMenu.slider_width + (180 if is_fullscreen else 120))
         runSettingsMenu.panel_rect = pygame.Rect(0, 0, panel_w, int(HEIGHT * 0.75))
         runSettingsMenu.panel_rect.center = (center_x, center_y)
 
         runSettingsMenu.action = None
+        runSettingsMenu.initialized = True
 
-    # RENDERIZADO
-    mouse_pos = pygame.mouse.get_pos()
-    center_x = WIDTH // 2
+    # ----------- EVENTOS -----------
+    for event in events:
+        if event.type == pygame.QUIT:
+            return 0
+
+        # Slider click + drag
+        if event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.MOUSEMOTION:
+            if pygame.mouse.get_pressed()[0]:
+                mx, my = event.pos
+                if runSettingsMenu.slider_hitbox.collidepoint(mx, my):
+                    rel_x = mx - runSettingsMenu.slider_x
+                    runSettingsMenu.volume = max(0, min(100,
+                        int((rel_x / runSettingsMenu.slider_width) * 100)))
+
+        if runSettingsMenu.easyBtn.handle_event(event):
+            runSettingsMenu.difficulty = "Easy"
+
+        if runSettingsMenu.hardBtn.handle_event(event):
+            runSettingsMenu.difficulty = "Hard"
+
+        if runSettingsMenu.onBtn.handle_event(event):
+            runSettingsMenu.fullscreen = True
+
+        if runSettingsMenu.offBtn.handle_event(event):
+            runSettingsMenu.fullscreen = False
+
+        if runSettingsMenu.saveButton.handle_event(event):
+            runSettingsMenu.action = "save"
+
+        if runSettingsMenu.backButton.handle_event(event):
+            runSettingsMenu.action = "back"
+
+    # ----------- RENDER -----------
     screen.blit(bg, (0, 0))
+    center_x = WIDTH // 2
 
+    # Panel
     panel_surf = pygame.Surface((runSettingsMenu.panel_rect.width, runSettingsMenu.panel_rect.height))
     panel_surf.set_alpha(195)
     panel_surf.fill((10, 5, 25))
     screen.blit(panel_surf, runSettingsMenu.panel_rect)
 
-    title_text = runSettingsMenu.title_font.render("Opciones", True, (210, 15, 240))
-    screen.blit(title_text, title_text.get_rect(center=(center_x, runSettingsMenu.panel_rect.top + 50)))
+    # Título
+    title_rect = runSettingsMenu.title_font.render("Opciones", True, (255, 60, 200)).get_rect(
+        center=(center_x, runSettingsMenu.panel_rect.top + 50)
+    )
+
+    for i in range(6, 0, -1):
+        glow = runSettingsMenu.title_font.render("Opciones", True, (255, 20, 147))
+        screen.blit(glow, title_rect)
+
+    title = runSettingsMenu.title_font.render("Opciones", True, (255, 60, 200))
+    screen.blit(title, title_rect)
 
     # Slider
-    pygame.draw.rect(screen, (60, 60, 80), (runSettingsMenu.slider_x, runSettingsMenu.slider_y, runSettingsMenu.slider_width, 8), border_radius=4)
+    pygame.draw.rect(screen, (60, 60, 80),
+        (runSettingsMenu.slider_x, runSettingsMenu.slider_y,
+         runSettingsMenu.slider_width, 8), border_radius=4)
+
     vol_w = (runSettingsMenu.volume / 100) * runSettingsMenu.slider_width
-    pygame.draw.rect(screen, (0, 255, 200), (runSettingsMenu.slider_x, runSettingsMenu.slider_y, vol_w, 8), border_radius=4)
-    pygame.draw.circle(screen, (255, 255, 255), (int(runSettingsMenu.slider_x + vol_w), runSettingsMenu.slider_y + 4), 10)
-    
-    vol_lbl = runSettingsMenu.label_font.render(f"Volumen: {runSettingsMenu.volume}", True, (200, 200, 200))
-    screen.blit(vol_lbl, (runSettingsMenu.slider_x, runSettingsMenu.slider_y - 30))
 
-    # Actualizar y Dibujar Etiquetas
-    all_btns = [runSettingsMenu.easyBtn, runSettingsMenu.hardBtn, runSettingsMenu.onBtn, 
-                runSettingsMenu.offBtn, runSettingsMenu.saveButton, runSettingsMenu.backButton]
-    
-    for btn in all_btns: btn.update(mouse_pos)
+    pygame.draw.rect(screen, (0, 255, 200),
+        (runSettingsMenu.slider_x, runSettingsMenu.slider_y,
+         vol_w, 8), border_radius=4)
 
-    diff_lbl = runSettingsMenu.label_font.render("Dificultad", True, (200, 200, 200))
-    screen.blit(diff_lbl, (runSettingsMenu.easyBtn.rect.x, runSettingsMenu.easyBtn.rect.y - 25))
-    
-    fs_lbl = runSettingsMenu.label_font.render("Pantalla Fullscreen", True, (200, 200, 200))
-    screen.blit(fs_lbl, (runSettingsMenu.onBtn.rect.x, runSettingsMenu.onBtn.rect.y - 25))
+    pygame.draw.circle(screen, (255, 255, 255),
+        (int(runSettingsMenu.slider_x + vol_w),
+         runSettingsMenu.slider_y + 4), 10)
 
-    # Dibujar Botones
+    # Texto volumen
+    vol_lbl = runSettingsMenu.label_font.render(
+        f"Volumen: {runSettingsMenu.volume}", True, (200, 200, 200))
+    screen.blit(vol_lbl, (runSettingsMenu.slider_x,
+                          runSettingsMenu.slider_y - 30))
+
+    # Botones
+    buttons = [
+        runSettingsMenu.easyBtn, runSettingsMenu.hardBtn,
+        runSettingsMenu.onBtn, runSettingsMenu.offBtn,
+        runSettingsMenu.saveButton, runSettingsMenu.backButton
+    ]
+
+    mouse_pos = pygame.mouse.get_pos()
+    for btn in buttons:
+        btn.update(mouse_pos)
+
     runSettingsMenu.easyBtn.draw(screen, selected=(runSettingsMenu.difficulty == "Easy"))
     runSettingsMenu.hardBtn.draw(screen, selected=(runSettingsMenu.difficulty == "Hard"))
-    runSettingsMenu.onBtn.draw(screen, selected=(runSettingsMenu.fullscreen == True))
-    runSettingsMenu.offBtn.draw(screen, selected=(runSettingsMenu.fullscreen == False))
+    runSettingsMenu.onBtn.draw(screen, selected=(runSettingsMenu.fullscreen))
+    runSettingsMenu.offBtn.draw(screen, selected=(not runSettingsMenu.fullscreen))
     runSettingsMenu.saveButton.draw(screen)
     runSettingsMenu.backButton.draw(screen)
 
-    # EVENTOS
-    for event in events:
-        if event.type == pygame.QUIT: return 0
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            mx, my = event.pos
-            if runSettingsMenu.slider_hitbox.collidepoint(mx, my):
-                rel_x = mx - runSettingsMenu.slider_x
-                runSettingsMenu.volume = max(0, min(100, int((rel_x / runSettingsMenu.slider_width) * 100)))
-        
-        if runSettingsMenu.easyBtn.handle_event(event): runSettingsMenu.difficulty = "Easy"
-        if runSettingsMenu.hardBtn.handle_event(event): runSettingsMenu.difficulty = "Hard"
-        if runSettingsMenu.onBtn.handle_event(event): runSettingsMenu.fullscreen = True
-        if runSettingsMenu.offBtn.handle_event(event): runSettingsMenu.fullscreen = False
-        if runSettingsMenu.saveButton.handle_event(event): runSettingsMenu.action = "save"
-        if runSettingsMenu.backButton.handle_event(event): runSettingsMenu.action = "back"
+    pygame.display.flip()
 
+    # ----------- ACCIONES -----------
     if runSettingsMenu.action == "save":
-        repo.save_settings("game_settings", runSettingsMenu.volume, runSettingsMenu.difficulty, runSettingsMenu.fullscreen)
-        screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN) if runSettingsMenu.fullscreen else pygame.display.set_mode((800, 600))
+        repo.save_settings(
+            "game_settings",
+            runSettingsMenu.volume,
+            runSettingsMenu.difficulty,
+            runSettingsMenu.fullscreen
+        )
+
+        screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN) if runSettingsMenu.fullscreen else pygame.display.set_mode((800,600))
         bg = pygame.transform.scale(bg, screen.get_size())
+
         runSettingsMenu.initialized = False
         runSettingsMenu.action = None
+
         return 2, screen, bg
 
     if runSettingsMenu.action == "back":
         runSettingsMenu.action = None
         return 1
 
-    pygame.display.flip()
     return 2
