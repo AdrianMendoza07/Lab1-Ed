@@ -19,8 +19,8 @@ else:
 # Reloj para controlar la velocidad de actualización (FPS)
 clock = pygame.time.Clock()
 
-bg = pygame.image.load("assets/images/background.jpeg").convert()
-bg = pygame.transform.scale(bg, screen.get_size())
+bg_original = pygame.image.load("assets/images/background.jpeg").convert()
+bg = pygame.transform.scale(bg_original, screen.get_size())
 
 running = True
 
@@ -44,7 +44,11 @@ while running:
         state = runStartMenu(screen, events, bg)   
     #Menu de Configuracion
     if state == 2:
-        state = runSettingsMenu(screen, events, bg)   
+        result = runSettingsMenu(screen, events, bg, bg_original)
+        if isinstance(result, tuple):
+            state, screen, bg = result
+        else:
+            state = result
 
     # Menú de leaderboard
     if state == 3:
