@@ -1,34 +1,42 @@
-from Persistence.Hash_table import HashTable
 from Persistence.Storage.Record_store import RecordStore
 
 class SettingsRepository:
     def __init__(self):
         self.store = RecordStore()
-        self.table = {}  
+        self.table = {}  # índice interno
         self._rebuild_index()
 
     def _rebuild_index(self):
         """Reconstruye el índice interno de los registros de manera segura."""
+
         self.table.clear()
-        for record in self.store.records:
+
+        # Obtener registros de manera segura
+        if hasattr(self.store, "records"):
+            records = self.store.records
+        elif hasattr(self.store, "get_all_records"):
+            records = self.store.get_all_records()
+        else:
+            records = []
+            print("WARNING: RecordStore no tiene records ni get_all_records")
+
+        for record in records:
             if not record.strip():
                 continue
-
             parts = record.split(",")
             if len(parts) < 2:
                 print(f"WARNING: registro inválido ignorado -> {record}")
                 continue
-
             key = parts[1].strip()
-            self.table[key] = record 
+            self.table[key] = record
 
-
+    # -------------------
+    # Métodos de acceso
+    # -------------------
     def get_settings(self, key):
-        """Retorna los datos del registro para una key, en formato dict"""
         record = self.table.get(key)
         if not record:
             return None
-
         parts = record.split(",")
         try:
             return {
@@ -42,7 +50,9 @@ class SettingsRepository:
             return None
 
     def save_settings(self, key, volume, difficulty, fullscreen):
-        """Guarda o actualiza la configuración en RecordStore"""
         record = f"user,{key},{volume},{difficulty},{fullscreen}"
-        self.store.add_record(record)
+        if hasattr(self.store, "add_record"):
+            self.store.add_record(record)
+        else:
+            print("WARNING: RecordStore no tiene add_record")
         self._rebuild_index()
