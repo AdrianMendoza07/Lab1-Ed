@@ -111,6 +111,13 @@ def runSettingsMenu(screen, events, bg):
     fs_lbl = runSettingsMenu.label_font.render("Pantalla Fullscreen", True, (200, 200, 200))
     screen.blit(fs_lbl, (runSettingsMenu.onBtn.rect.x, runSettingsMenu.onBtn.rect.y - 25))
 
+
+    for btn in [runSettingsMenu.easyBtn, runSettingsMenu.hardBtn, runSettingsMenu.onBtn, runSettingsMenu.offBtn]:
+        if hasattr(btn, "base_color"):
+            btn.base_color = (60, 60, 80)
+        if hasattr(btn, "hover_color"):
+            btn.hover_color = (90, 90, 110)
+
     # Dibujar botones
     runSettingsMenu.easyBtn.draw(screen)
     runSettingsMenu.hardBtn.draw(screen)
@@ -118,13 +125,6 @@ def runSettingsMenu(screen, events, bg):
     runSettingsMenu.offBtn.draw(screen)
     runSettingsMenu.saveButton.draw(screen)
     runSettingsMenu.backButton.draw(screen)
-
-
-    neutral_overlay = pygame.Surface((runSettingsMenu.easyBtn.rect.width, runSettingsMenu.easyBtn.rect.height), pygame.SRCALPHA)
-    neutral_overlay.fill((30, 30, 40, 180))
-
-    for btn in [runSettingsMenu.easyBtn, runSettingsMenu.hardBtn, runSettingsMenu.onBtn, runSettingsMenu.offBtn]:
-        screen.blit(neutral_overlay, btn.rect.topleft)
 
 
     overlay = pygame.Surface((runSettingsMenu.easyBtn.rect.width, runSettingsMenu.easyBtn.rect.height), pygame.SRCALPHA)
