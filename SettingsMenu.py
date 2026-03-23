@@ -2,7 +2,7 @@ import pygame
 from Button import Button
 from Repositories.settings_repository import SettingsRepository
 
-repo = Settings_Repository()
+repo = SettingsRepository()
 
 def runSettingsMenu(screen, events, bg):
     WIDTH, HEIGHT = screen.get_size()
