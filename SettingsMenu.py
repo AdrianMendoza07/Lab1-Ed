@@ -1,3 +1,7 @@
+import pygame
+from Button import Button
+from Repositories.settings_repository import SettingsRepository
+
 repo = SettingsRepository()
 
 def runSettingsMenu(screen, events, bg, bg_original):
