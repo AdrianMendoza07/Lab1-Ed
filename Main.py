@@ -55,13 +55,12 @@ while running:
     if state == 3:
         state = runLeaderboardMenu(screen, events, bg)
         
-    # Control de FPS (60 cuadros por segundo)
-    if state == 3:
+    if state == 4:
         state = runUsersMenu(screen, events, bg)  
 
-    if state == 4:
+    if state == 5:
         state = runNewUsersMenu(screen, events, bg)    
-        if state == 3:  # coming back to users menu
+        if state == 4:  # coming back to users menu
             if hasattr(runUsersMenu, "initialized"):
                 del runUsersMenu.initialized
     
