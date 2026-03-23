@@ -1,29 +1,62 @@
 import pygame
 from Button import Button
 
-
 def runStartMenu(screen, events, bg):
-    
-    WIDTH, HEIGHT = screen.get_size()
 
-    # Variables creadas solo al inicio
-    if not hasattr(runStartMenu, "initialized"):
+    WIDTH, HEIGHT = screen.get_size()
+    is_fullscreen = screen.get_flags() & pygame.FULLSCREEN
+
+    # Re-inicializar si cambia tamaño
+    if not hasattr(runStartMenu, "last_size") or runStartMenu.last_size != (WIDTH, HEIGHT):
+        runStartMenu.initialized = False
+        runStartMenu.last_size = (WIDTH, HEIGHT)
+
+    if not hasattr(runStartMenu, "initialized") or runStartMenu.initialized == False:
         runStartMenu.initialized = True
 
-        # Fuentes 
-        runStartMenu.title_font = pygame.font.Font("assets/fonts/Orbitron-Bold.ttf", 80)
-        runStartMenu.button_font = pygame.font.Font("assets/fonts/Orbitron-Regular.ttf", 40)
+        center_x = WIDTH // 2
 
-        # Botones
-        runStartMenu.startButton = Button("Nuevo Juego", 500, 60, (WIDTH//2 , 350), runStartMenu.button_font)
-        runStartMenu.leaderboardButton = Button("Leaderboard", 500, 60, (WIDTH//2, 430), runStartMenu.button_font)
-        runStartMenu.settingsButton = Button("Opciones", 500, 60, (WIDTH//2, 510), runStartMenu.button_font)
-        runStartMenu.quitButton = Button("Salir", 500, 60, (WIDTH//2, 590), runStartMenu.button_font)
+        # 🔥 CONFIGURACIÓN POR MODO
+        if is_fullscreen:
+            title_size = 80
+            button_font_size = 40
 
-        # Estado
+            button_width = 500
+            button_height = 60
+
+            start_y = 350
+            spacing = 80
+
+        else:
+            # 🔧 MÁS COMPACTO PARA VENTANA
+            title_size = 60
+            button_font_size = 28
+
+            button_width = 400
+            button_height = 50
+
+            start_y = int(HEIGHT * 0.35)
+            spacing = int(HEIGHT * 0.11)
+
+        # Fuentes
+        runStartMenu.title_font = pygame.font.Font("assets/fonts/Orbitron-Bold.ttf", title_size)
+        runStartMenu.button_font = pygame.font.Font("assets/fonts/Orbitron-Regular.ttf", button_font_size)
+
+        # Botones (centrados SIEMPRE)
+        runStartMenu.startButton = Button("Nuevo Juego", button_width, button_height, (center_x, start_y), runStartMenu.button_font)
+
+        runStartMenu.leaderboardButton = Button("Leaderboard", button_width, button_height,
+                                                (center_x, start_y + spacing*2), runStartMenu.button_font)
+
+        runStartMenu.settingsButton = Button("Opcion", button_width, button_height,
+                                             (center_x, start_y + spacing*3), runStartMenu.button_font)
+
+        runStartMenu.quitButton = Button("Salir", button_width, button_height,
+                                         (center_x, start_y + spacing*4), runStartMenu.button_font)
+
         runStartMenu.action = None
 
-    # Para acceder a los botones mas rapido
+    # Referencias rápidas
     startButton = runStartMenu.startButton
     leaderboardButton = runStartMenu.leaderboardButton
     settingsButton = runStartMenu.settingsButton
@@ -31,7 +64,7 @@ def runStartMenu(screen, events, bg):
 
     title_font = runStartMenu.title_font
 
-    # Manejo de eventos
+    # Eventos
     for event in events:
         if event.type == pygame.QUIT:
             return 0
@@ -48,7 +81,6 @@ def runStartMenu(screen, events, bg):
         if startButton.handle_event(event):
             runStartMenu.action = "users"    
 
-    # Actualizar posicion y botones
     mouse_pos = pygame.mouse.get_pos()
 
     startButton.update(mouse_pos)
@@ -56,16 +88,19 @@ def runStartMenu(screen, events, bg):
     settingsButton.update(mouse_pos)
     quitButton.update(mouse_pos)
 
-    # Seccion de draw
-    # Limpiar pantalla
+    # Draw
     screen.blit(bg, (0, 0))
 
-    # Titulo
+    # Título dinámico
+    title_y = int(HEIGHT * (0.2 if is_fullscreen else 0.15))
     title = title_font.render("Neon Runners", True, (255, 60, 200))
-    title_rect = title.get_rect(center=(WIDTH//2, 150))
+    title_rect = title.get_rect(center=(WIDTH//2, title_y))
+
     for i in range(6, 0, -1):
         glow = title_font.render("Neon Runners", True, (255, 20, 147))
         screen.blit(glow, title_rect)
+
+    screen.blit(title, title_rect)
 
     # Botones
     startButton.draw(screen)
@@ -73,7 +108,7 @@ def runStartMenu(screen, events, bg):
     settingsButton.draw(screen)
     quitButton.draw(screen)
 
-    # Cambio de estado (para delay entre click y cambio)
+    # Acciones
     if runStartMenu.action == "settings" and settingsButton.is_ready():
         runStartMenu.action = None
         return 2
@@ -87,6 +122,4 @@ def runStartMenu(screen, events, bg):
         return 0
 
     pygame.display.flip()
-
     return 1
-
