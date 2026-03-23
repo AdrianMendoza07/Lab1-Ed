@@ -16,7 +16,7 @@ def runSettingsMenu(screen, events, bg):
         is_fullscreen = screen.get_flags() & pygame.FULLSCREEN
         center_x = WIDTH // 2
         center_y = HEIGHT // 2
-
+        
         scale = 1.0 if is_fullscreen else 0.8
 
         # Fuentes
@@ -29,12 +29,12 @@ def runSettingsMenu(screen, events, bg):
         runSettingsMenu.button_font = pygame.font.Font("assets/fonts/Orbitron-Regular.ttf", button_font_size)
 
 
-        row_height = int(110 * scale)
+        row_height = int(110 * scale) if is_fullscreen else int(85 * scale)
         
         if is_fullscreen:
             start_y = center_y - (row_height * 1.8) 
         else:
-            start_y = center_y - (row_height * 1.2)
+            start_y = center_y - (row_height * 2.0)
 
         # Botones medidas
         btn_w = int(140 * scale)
@@ -44,7 +44,7 @@ def runSettingsMenu(screen, events, bg):
         # Slider de Volumen
         runSettingsMenu.slider_width = int(WIDTH * 0.4)
         runSettingsMenu.slider_x = center_x - runSettingsMenu.slider_width // 2
-        runSettingsMenu.slider_y = start_y + 40 
+        runSettingsMenu.slider_y = start_y + (30 if is_fullscreen else 20)
         runSettingsMenu.slider_hitbox = pygame.Rect(runSettingsMenu.slider_x, runSettingsMenu.slider_y - 20, 
                                                    runSettingsMenu.slider_width, 40)
 
@@ -68,9 +68,9 @@ def runSettingsMenu(screen, events, bg):
                                             (center_x + shift_right + (gap//4), action_y),
                                             runSettingsMenu.button_font)
 
-        # Panel
+
         panel_w = int(runSettingsMenu.slider_width + (180 if is_fullscreen else 120))
-        panel_h = int(HEIGHT * (0.85 if is_fullscreen else 0.75))
+        panel_h = int(HEIGHT * (0.75 if is_fullscreen else 0.75))
         runSettingsMenu.panel_rect = pygame.Rect(0, 0, panel_w, panel_h)
         runSettingsMenu.panel_rect.center = (center_x, center_y)
 
@@ -86,7 +86,7 @@ def runSettingsMenu(screen, events, bg):
             runSettingsMenu.difficulty = "Easy"
             runSettingsMenu.fullscreen = False
 
-    # --- RENDERIZADO ---
+    # RENDERIZADO
     mouse_pos = pygame.mouse.get_pos()
     screen.blit(bg, (0, 0))
     center_x = WIDTH // 2
@@ -97,9 +97,9 @@ def runSettingsMenu(screen, events, bg):
     panel_surf.fill((10, 5, 25))
     screen.blit(panel_surf, runSettingsMenu.panel_rect)
 
-    # Título 
+    # Título
     title_text = runSettingsMenu.title_font.render("Opciones", True, (210, 15, 240))
-    screen.blit(title_text, title_text.get_rect(center=(center_x, runSettingsMenu.panel_rect.top + 60)))
+    screen.blit(title_text, title_text.get_rect(center=(center_x, runSettingsMenu.panel_rect.top + 50)))
 
     # Slider
     pygame.draw.rect(screen, (60, 60, 80), (runSettingsMenu.slider_x, runSettingsMenu.slider_y, runSettingsMenu.slider_width, 8), border_radius=4)
@@ -108,11 +108,11 @@ def runSettingsMenu(screen, events, bg):
     pygame.draw.circle(screen, (255, 255, 255), (int(runSettingsMenu.slider_x + vol_w), runSettingsMenu.slider_y + 4), 10)
     
     vol_lbl = runSettingsMenu.label_font.render(f"Volumen: {runSettingsMenu.volume}", True, (200, 200, 200))
-    screen.blit(vol_lbl, (runSettingsMenu.slider_x, runSettingsMenu.slider_y - 35))
+    screen.blit(vol_lbl, (runSettingsMenu.slider_x, runSettingsMenu.slider_y - 30))
 
     # Dificultad
     diff_lbl = runSettingsMenu.label_font.render("Dificultad", True, (200, 200, 200))
-    screen.blit(diff_lbl, (runSettingsMenu.easy_rect.x, runSettingsMenu.easy_rect.y - 30))
+    screen.blit(diff_lbl, (runSettingsMenu.easy_rect.x, runSettingsMenu.easy_rect.y - 25))
     
     e_col = (0, 200, 100) if runSettingsMenu.difficulty == "Easy" else (60, 60, 60)
     h_col = (200, 50, 50) if runSettingsMenu.difficulty == "Hard" else (60, 60, 60)
@@ -123,7 +123,7 @@ def runSettingsMenu(screen, events, bg):
 
     # Fullscreen
     fs_lbl = runSettingsMenu.label_font.render("Pantalla Fullscreen", True, (200, 200, 200))
-    screen.blit(fs_lbl, (runSettingsMenu.fs_on_rect.x, runSettingsMenu.fs_on_rect.y - 30))
+    screen.blit(fs_lbl, (runSettingsMenu.fs_on_rect.x, runSettingsMenu.fs_on_rect.y - 25))
     on_col = (0, 200, 100) if runSettingsMenu.fullscreen else (60, 60, 60)
     off_col = (200, 50, 50) if not runSettingsMenu.fullscreen else (60, 60, 60)
     pygame.draw.rect(screen, on_col, runSettingsMenu.fs_on_rect, border_radius=10)
@@ -136,7 +136,6 @@ def runSettingsMenu(screen, events, bg):
     runSettingsMenu.saveButton.draw(screen)
     runSettingsMenu.backButton.draw(screen)
 
-    # EVENTOS 
     for event in events:
         if event.type == pygame.QUIT: return 0
         if event.type == pygame.MOUSEBUTTONDOWN:
