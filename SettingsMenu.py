@@ -1,10 +1,6 @@
-import pygame
-from Button import Button
-from Repositories.settings_repository import SettingsRepository
-
 repo = SettingsRepository()
 
-def runSettingsMenu(screen, events, bg):
+def runSettingsMenu(screen, events, bg, bg_original):
     WIDTH, HEIGHT = screen.get_size()
 
     # Detectar cambio de tamaño
@@ -60,6 +56,7 @@ def runSettingsMenu(screen, events, bg):
 
         # Botones
         diff_y = runSettingsMenu.slider_y + row_height
+
         runSettingsMenu.easyBtn = Button("Easy", btn_w, btn_h,
             (center_x - (btn_w // 2) - (gap // 2), diff_y),
             runSettingsMenu.button_font)
@@ -69,6 +66,7 @@ def runSettingsMenu(screen, events, bg):
             runSettingsMenu.button_font)
 
         fs_y = diff_y + row_height
+
         runSettingsMenu.onBtn = Button("ON", btn_w, btn_h,
             (center_x - (btn_w // 2) - (gap // 2), fs_y),
             runSettingsMenu.button_font)
@@ -78,6 +76,7 @@ def runSettingsMenu(screen, events, bg):
             runSettingsMenu.button_font)
 
         action_y = fs_y + row_height + int(35 * scale)
+
         runSettingsMenu.saveButton = Button("Guardar", btn_w, btn_h,
             (center_x - (btn_w // 2) - (gap // 4), action_y),
             runSettingsMenu.button_font)
@@ -99,7 +98,6 @@ def runSettingsMenu(screen, events, bg):
         if event.type == pygame.QUIT:
             return 0
 
-        # Slider click + drag
         if event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.MOUSEMOTION:
             if pygame.mouse.get_pressed()[0]:
                 mx, my = event.pos
@@ -191,6 +189,7 @@ def runSettingsMenu(screen, events, bg):
 
     # ----------- ACCIONES -----------
     if runSettingsMenu.action == "save":
+
         repo.save_settings(
             "game_settings",
             runSettingsMenu.volume,
@@ -198,8 +197,13 @@ def runSettingsMenu(screen, events, bg):
             runSettingsMenu.fullscreen
         )
 
-        screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN) if runSettingsMenu.fullscreen else pygame.display.set_mode((800,600))
-        bg = pygame.transform.scale(bg, screen.get_size())
+
+        if runSettingsMenu.fullscreen:
+            screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+        else:
+            screen = pygame.display.set_mode((800,600))
+
+        bg = pygame.transform.scale(bg_original, screen.get_size())
 
         runSettingsMenu.initialized = False
         runSettingsMenu.action = None

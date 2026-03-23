@@ -19,8 +19,8 @@ else:
 # Reloj para controlar la velocidad de actualización (FPS)
 clock = pygame.time.Clock()
 
-bg = pygame.image.load("assets/images/background.jpeg").convert()
-bg = pygame.transform.scale(bg, screen.get_size())
+bg_original = pygame.image.load("assets/images/background.jpeg").convert()
+bg = pygame.transform.scale(bg_original, screen.get_size())
 
 running = True
 
