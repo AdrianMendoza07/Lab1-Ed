@@ -44,7 +44,11 @@ while running:
         state = runStartMenu(screen, events, bg)   
     #Menu de Configuracion
     if state == 2:
-        state = runSettingsMenu(screen, events, bg)   
+        result = runSettingsMenu(screen, events, bg, bg_original)
+        if isinstance(result, tuple):
+            state, screen, bg = result
+        else:
+            state = result
 
     # Menú de leaderboard
     if state == 3:
