@@ -2,73 +2,47 @@ from Persistence.Hash_table import HashTable
 from Persistence.Storage.Record_store import RecordStore
 
 class SettingsRepository:
-
     def __init__(self):
-        self.table = HashTable()
         self.store = RecordStore()
-
+        self.table = {}  
         self._rebuild_index()
 
-    def save_settings(self, key, volume, difficulty, fullscreen):
-        volume = max(0, min(100, volume))
+    def _rebuild_index(self):
+        """Reconstruye el índice interno de los registros de manera segura."""
+        self.table.clear()
+        for record in self.store.records:
+            if not record.strip():
+                continue
 
-        # Formato CSV
-        record = f"settings,{key},{volume},{difficulty},{fullscreen}\n"
+            parts = record.split(",")
+            if len(parts) < 2:
+                print(f"WARNING: registro inválido ignorado -> {record}")
+                continue
 
-        position = self.store.append(record)
-        self.table.insert(key, position)
+            key = parts[1].strip()
+            self.table[key] = record 
+
 
     def get_settings(self, key):
-        position = self.table.search(key)
-
-        if position == -1:
+        """Retorna los datos del registro para una key, en formato dict"""
+        record = self.table.get(key)
+        if not record:
             return None
 
-        with open("data.log", "r") as file:
-            file.seek(position)
-            line = file.readline().strip()
-
-        # Convertir CSV → diccionario
-        parts = line.split(",")
-
-        return {
-            "type": parts[0],
-            "key": parts[1],
-            "data": {
-                "volume": int(parts[2]),
-                "difficulty": parts[3],
-                "fullscreen": parts[4] == "True"
-            }
-        }
-
-    def _rebuild_index(self):
+        parts = record.split(",")
         try:
-            with open("data.log", "r") as file:
-                while True:
-                    offset = file.tell()
+            return {
+                "data": {
+                    "volume": int(parts[2]),
+                    "difficulty": parts[3],
+                    "fullscreen": parts[4].lower() == "true"
+                }
+            }
+        except IndexError:
+            return None
 
-                    line = file.readline()
-                    if not line:
-                        break
-
-                    parts = line.strip().split(",")
-                    key = parts[1]
-
-                    self.table.insert(key, offset)
-
-        except FileNotFoundError:
-            pass
-
-
-def get_settings_data():
-    repo = SettingsRepository()
-    data = repo.get_settings("game_settings")
-
-    if data:
-        return data["data"]
-
-    return {
-        "volume": 50,
-        "difficulty": "Easy",
-        "fullscreen": False
-    }
+    def save_settings(self, key, volume, difficulty, fullscreen):
+        """Guarda o actualiza la configuración en RecordStore"""
+        record = f"user,{key},{volume},{difficulty},{fullscreen}"
+        self.store.add_record(record)
+        self._rebuild_index()
