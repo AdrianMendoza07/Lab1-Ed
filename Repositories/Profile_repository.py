@@ -23,6 +23,7 @@ class ProfileRepository:
         file.close()
         return line
     
+   
     def get_next_id(self):
         try:
             with open("data.log", "r") as file:
@@ -48,6 +49,7 @@ class ProfileRepository:
             with open("data.log", "r") as file:
                 for line in file:
                     line = line.strip()
+                    # 🔥 skip empty lines
 
                     
                     if not line:
@@ -55,6 +57,7 @@ class ProfileRepository:
 
                     parts = line.split(",")
 
+                    # 🔥 skip corrupted lines
                     
                     if len(parts) < 4:
                         print(f"Skipping invalid line: {line}")
@@ -73,5 +76,3 @@ class ProfileRepository:
             pass
 
         return profiles
-        
-    
