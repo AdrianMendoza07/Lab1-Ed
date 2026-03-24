@@ -19,7 +19,8 @@ class ProfileRepository:
 
     def get_profile(self, player_id):
         position = self.table.search(player_id)
-        if position == -1:
+
+        if position is None or position == -1:
             return None
         with open(self.store.filename, "r", encoding="utf-8") as file:
             file.seek(position)
