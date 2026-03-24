@@ -1,10 +1,10 @@
 from Persistence.Hash_entry import HashEntry
 class HashTable:
-    def __init__(self, capacity=5000):  # Ajustamos capacidad para 5000 registros
+    def __init__(self, capacity=5000):  
         self.capacity = capacity
         self.buckets = [[] for _ in range(capacity)]
-        self.collisions = 0  # Contador de colisiones
-        self.count = 0       # Contador de elementos insertados
+        self.collisions = 0  
+        self.count = 0      
 
     def hash_function(self, key):
         total = sum(ord(c) for c in key)
@@ -13,7 +13,7 @@ class HashTable:
     def insert(self, key, position):
         index = self.hash_function(key)
         bucket = self.buckets[index]
-        if bucket:  # Si hay elementos → colisión
+        if bucket:
             self.collisions += 1
         for entry in bucket:
             if entry.key == key:
