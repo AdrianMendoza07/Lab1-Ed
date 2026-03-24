@@ -113,6 +113,7 @@ def runStartMenu(screen, events, bg):
         runStartMenu.action = None
         return 2
     if runStartMenu.action == "leaderboard" and leaderboardButton.is_ready():
+        runStartMenu.action = None
         return 3
     if runStartMenu.action == "users" and startButton.is_ready():
         runStartMenu.action = None

@@ -1,0 +1,15 @@
+# carpetas completas
+assets/
+venv/
+myenv/
+__pycache__/
+Persistence/
+Storage/
+
+# archivos binarios
+*.png
+*.jpg
+*.jpeg
+*.ttf
+*.log
+*.pyc
