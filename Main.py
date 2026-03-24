@@ -11,8 +11,7 @@ from Game import runGame
 pygame.init()
 
 settings = get_settings_data()
-repo = ProfileRepository()
-player1 = repo.get_profile("player1")
+selected_user = None
 
 if settings["fullscreen"]:
     screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
@@ -24,6 +23,10 @@ clock = pygame.time.Clock()
 
 bg_original = pygame.image.load("assets/images/background.jpeg").convert()
 bg = pygame.transform.scale(bg_original, screen.get_size())
+
+bg_original2 = pygame.image.load("assets/images/background2.png").convert()
+bg2 = pygame.transform.scale(bg_original2, screen.get_size())
+
 
 running = True
 
@@ -45,6 +48,7 @@ while running:
     # Menú principal
     if state == 1:
         state = runStartMenu(screen, events, bg)   
+    
     #Menu de Configuracion
     if state == 2:
         result = runSettingsMenu(screen, events, bg, bg_original)
@@ -57,17 +61,29 @@ while running:
     if state == 3:
         state = runLeaderboardMenu(screen, events, bg)
         
-    if state == 4:
-        state = runUsersMenu(screen, events, bg)  
-
+    #Menu de creacion de perfil
     if state == 5:
         state = runNewUsersMenu(screen, events, bg)    
         if state == 4:  # coming back to users menu
             if hasattr(runUsersMenu, "initialized"):
                 del runUsersMenu.initialized
-                
+    
+    #Menu de seleccion de usuarion antes del juego
+    if state == 4:
+        result = runUsersMenu(screen, events, bg)
+
+        if isinstance(result, tuple):
+            state, selected_user = result
+        else:
+            state = result
+        
+    #Juego            
     if state == 6:
-        state = runGame(screen, events, bg, player1)       
+        if selected_user is None:
+            print("ERROR: no hay usuario seleccionado")
+            state = 4
+        else:
+            state = runGame(screen, events, bg2, selected_user)    
     
     clock.tick(60)    
         

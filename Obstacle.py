@@ -12,13 +12,15 @@ class Obstacle:
         self.image = image
 
         # Escalado moderado automático
-        self.scale = pygame.transform.scale(self.image, (50, 50))
+        self.scale = pygame.transform.scale(self.image, (80, 80))
         
         self.rect = self.scale.get_rect()
         self.rect.x = x
         self.rect.y = ground_y - self.rect.height
 
         self.speed = speed
+        
+        self.type = "mortal"
 
     def update(self):
         """Movimiento del obstáculo"""
