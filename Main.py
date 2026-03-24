@@ -4,40 +4,43 @@ import pygame
 from StartMenu import runStartMenu
 from SettingsMenu import runSettingsMenu
 from Repositories.settings_repository import get_settings_data
-from Repositories.Profile_repository import ProfileRepository
+from Repositories.Profile_repository import ProfileRepository  # versión JSON
 from LeaderboardMenu import runLeaderboardMenu
 from Game import runGame  
-
-
-repo=ProfileRepository()
-repo.save_profile("player1", "nataly", 0,0)
-player1=repo.get_profile("player1")
 
 import sys
 import random
 import string
 import time
 
-pygame.init()
 
+# Inicialización del repositorio de perfiles en JSON
+
+repo = ProfileRepository()
+repo.store.records = []  # limpiar cualquier dato previo
+repo.save_profile("player1", "nataly", 0, 0)
+player1 = repo.get_profile("player1")
+
+
+# Función auxiliar para nombres aleatorios
 def random_name(length=6):
     return ''.join(random.choices(string.ascii_letters, k=length))
 
+
+# Benchmark para medir rendimiento con distintos tamaños
 def run_benchmark_for_size(num_records):
     print(f"\n--- Probando con {num_records} registros ---")
     repo = ProfileRepository()
     repo.table = repo.table.__class__(capacity=num_records)
-
-    # Limpiar archivo antes de insertar
-    open(repo.store.filename, "w").close()
+    repo.store.records = [] 
 
     # Inserción
     start_insert = time.perf_counter()
     for _ in range(num_records):
         player_id = repo.get_next_id()
         name = random_name()
-        score = random.randint(0,1000)
-        max_score = score + random.randint(0,1000)
+        score = random.randint(0, 1000)
+        max_score = score + random.randint(0, 1000)
         repo.save_profile(player_id, name, score, max_score)
     end_insert = time.perf_counter()
     insertion_time = end_insert - start_insert
@@ -60,14 +63,18 @@ def run_benchmark_for_size(num_records):
     print(f"Número de colisiones: {collisions}")
     print(f"Factor de carga: {load_factor:.4f}")
 
-
+# --------------------------------------------------------
+# Ejecutar benchmark si se pasa "--benchmark"
+# --------------------------------------------------------
 if "--benchmark" in sys.argv:
     for size in [1000, 5000, 20000]:
         run_benchmark_for_size(size)
     sys.exit(0)
 
-
-# Juego
+# --------------------------------------------------------
+# Inicialización de Pygame y configuración de pantalla
+# --------------------------------------------------------
+pygame.init()
 settings = get_settings_data()
 
 if settings["fullscreen"]:
@@ -75,55 +82,42 @@ if settings["fullscreen"]:
 else:
     screen = pygame.display.set_mode((800, 600))
 
-# Reloj para controlar la velocidad de actualización (FPS)
 clock = pygame.time.Clock()
-
 bg_original = pygame.image.load("assets/images/background.jpeg").convert()
 bg = pygame.transform.scale(bg_original, screen.get_size())
 
+
+# Bucle principal del juego y navegación de menús
+
 running = True
+state = 1  # estado inicial
 
-# Variable de estado que controla el menú 
-state = 1
-
-# Bucle principal del programa
 while running:
-    
-    # Captura de todos los eventos del sistema (teclado, mouse, etc.)
     events = pygame.event.get()
-
     for event in events:
-        # Si el usuario cierra la ventana o el estado indica salida
         if event.type == pygame.QUIT or state == 0:
             running = False
 
-    # Control de navegación entre menús según el estado actual
-    # Menú principal
     if state == 1:
-        state = runStartMenu(screen, events, bg)   
-    #Menu de Configuracion
+        state = runStartMenu(screen, events, bg)
     if state == 2:
         result = runSettingsMenu(screen, events, bg, bg_original)
         if isinstance(result, tuple):
             state, screen, bg = result
         else:
             state = result
-
-    # Menú de leaderboard
     if state == 3:
         state = runLeaderboardMenu(screen, events, bg)
-        
     if state == 4:
-        state = runUsersMenu(screen, events, bg)  
-
+        state = runUsersMenu(screen, events, bg)
     if state == 5:
-        state = runNewUsersMenu(screen, events, bg)    
-        if state == 4:  # coming back to users menu
+        state = runNewUsersMenu(screen, events, bg)
+        if state == 4:
             if hasattr(runUsersMenu, "initialized"):
                 del runUsersMenu.initialized
-    if state==6:
-        state=runGame(screen, events, bg, player1)
-    clock.tick(60)    
-        
-# Finalización de pygame y liberación de recursos
+    if state == 6:
+        state = runGame(screen, events, bg, player1)
+
+    clock.tick(60)
+
 pygame.quit()
