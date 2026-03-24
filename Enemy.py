@@ -4,7 +4,7 @@ class Enemy:
     def __init__(self, delay_ms=500):
         self.frames = []
         for i in range(1, 11):
-            img = pygame.image.load(f"assets/enemy/cop{i}.png").convert_alpha()
+            img = pygame.image.load(f"assets/images/enemy/cop{i}.png").convert_alpha()
             img = pygame.transform.scale(img, (60, 60))  # ajusta tamaño
             self.frames.append(img)
 

@@ -6,16 +6,13 @@ from SettingsMenu import runSettingsMenu
 from Repositories.settings_repository import get_settings_data
 from Repositories.Profile_repository import ProfileRepository
 from LeaderboardMenu import runLeaderboardMenu
-from Game import runGame  
-
-
-repo=ProfileRepository()
-repo.save_profile("player1", "nataly", 0,0)
-player1=repo.get_profile("player1")
+from Game import runGame
 
 pygame.init()
 
 settings = get_settings_data()
+repo = ProfileRepository()
+player1 = repo.get_profile("player1")
 
 if settings["fullscreen"]:
     screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
@@ -68,8 +65,10 @@ while running:
         if state == 4:  # coming back to users menu
             if hasattr(runUsersMenu, "initialized"):
                 del runUsersMenu.initialized
-    if state==6:
-        state=runGame(screen, events, bg, player1)
+                
+    if state == 6:
+        state = runGame(screen, events, bg, player1)       
+    
     clock.tick(60)    
         
 # Finalización de pygame y liberación de recursos

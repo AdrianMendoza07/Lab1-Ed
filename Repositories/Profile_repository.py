@@ -12,6 +12,9 @@ class ProfileRepository:
         record = player_id + "," + name + "," + str(score) + "," + str(max_score)
         position = self.store.add_record(record)
         self.table.insert(player_id, position)
+    
+    def set_max_score(self, value):
+        self.max_score = value
 
     def get_profile(self, player_id):
         position = self.table.search(player_id)
