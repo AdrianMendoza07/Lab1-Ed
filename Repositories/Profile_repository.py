@@ -108,4 +108,4 @@ def run_benchmark(num_records=5000, num_search=1000):
     print(f"Factor de carga: {load_factor:.4f}")
 
 if __name__ == "__main__":
-    run_benchmark()  # por defecto 5000 registros y 1000 búsquedas
+    run_benchmark()  
