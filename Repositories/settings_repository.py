@@ -1,67 +1,78 @@
-from Persistence.Storage.Record_store import RecordStore
+import json
+import os
 
 class SettingsRepository:
-    def __init__(self):
-        self.store = RecordStore()
-        self.table = {}
+    # Repositorio de configuraciones del juego usando JSON
+    def __init__(self, filename="settings.json"):
+        self.store_file = filename
+        self.table = {}  # índice rápido por key
+        self._load_store()
         self._rebuild_index()
 
+    # Cargar store desde JSON o inicializar vacío
+    def _load_store(self):
+        if os.path.exists(self.store_file):
+            try:
+                with open(self.store_file, "r", encoding="utf-8") as f:
+                    self.store = json.load(f)
+            except json.JSONDecodeError:
+                print("WARNING: JSON corrupto, se reinicia store")
+                self.store = []
+        else:
+            self.store = []
+
+    # Guardar store completo en JSON
+    def _save_store(self):
+        with open(self.store_file, "w", encoding="utf-8") as f:
+            json.dump(self.store, f, indent=4)
+
+    # Reconstruir índice interno por clave
     def _rebuild_index(self):
-        """Reconstruye el índice de settings desde el store"""
         self.table.clear()
-        records = self.store.get_all_records() if hasattr(self.store, "get_all_records") else []
+        for record in self.store:
+            key = record.get("key")
+            if key:
+                self.table[key] = record
 
-        for record in records:
-            if not record.strip():
-                continue
-            parts = record.split(",")
-            if len(parts) < 9:
-                print(f"WARNING: registro inválido ignorado -> {record}")
-                continue
-            key = parts[5].strip()  
-            self.table[key] = record
-
+    # Obtener configuración por clave
     def get_settings(self, key):
         record = self.table.get(key)
         if not record:
             return None
-        parts = record.split(",")
-        try:
-            return {
-                "data": {
-                    "volume": int(parts[6]),
-                    "difficulty": parts[7],
-                    "fullscreen": parts[8].lower() == "true"
-                }
+        return {
+            "data": {
+                "volume": int(record.get("volume", 50)),
+                "difficulty": record.get("difficulty", "Easy"),
+                "fullscreen": bool(record.get("fullscreen", False))
             }
-        except IndexError:
-            print(f"WARNING: datos incompletos en registro -> {record}")
-            return None
+        }
 
+    # Guardar o actualizar configuración
     def save_settings(self, key, volume, difficulty, fullscreen):
         existing = self.table.get(key)
         if existing:
-            parts = existing.split(",")
-            parts[6] = str(volume)
-            parts[7] = difficulty
-            parts[8] = str(fullscreen)
-            record = ",".join(parts)
-            if hasattr(self.store, "update_record"):
-                self.store.update_record(record)
-            else:
-                print("WARNING: RecordStore no tiene update_record")
+            existing["volume"] = volume
+            existing["difficulty"] = difficulty
+            existing["fullscreen"] = fullscreen
         else:
-            record = f"player1,Nataly,200,1200,settings,{key},{volume},{difficulty},{fullscreen}"
-            if hasattr(self.store, "add_record"):
-                self.store.add_record(record)
-            else:
-                print("WARNING: RecordStore no tiene add_record")
-
+            # Crear nuevo registro
+            new_record = {
+                "player_id": "player1",
+                "name": "Nataly",
+                "score": 200,
+                "max_score": 1200,
+                "type": "settings",
+                "key": key,
+                "volume": volume,
+                "difficulty": difficulty,
+                "fullscreen": fullscreen
+            }
+            self.store.append(new_record)
+        self._save_store()
         self._rebuild_index()
 
-
+# Retorna la configuración principal del juego
 def get_settings_data():
-    """Retorna la configuración 'game_settings'"""
     repo = SettingsRepository()
     data = repo.get_settings("game_settings")
     if data is None:
