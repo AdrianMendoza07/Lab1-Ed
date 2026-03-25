@@ -1,6 +1,4 @@
-HashEntry_data = {
-  "HashEntry": {
-    "key": None,
-    "position": None
-  }
-}
+class HashEntry:
+    def __init__(self, key, position):
+        self.key=key
+        self.position=position

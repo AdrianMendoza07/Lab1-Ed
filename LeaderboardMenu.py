@@ -165,17 +165,17 @@ def runLeaderboardMenu(screen, events, bg):
         y += 40
         posicion += 1
 
-    backButton.update(mouse_pos)
+        backButton.update(mouse_pos)
 
-    # Dibuja el botón "Volver"
-    backButton.draw(screen)
+        # Dibuja el botón "Volver"
+        backButton.draw(screen)
 
-    # Control de acción del botón
-    if runLeaderboardMenu.action == "back" and backButton.is_ready():
-        runLeaderboardMenu.action = None
-        return 1
+        # Control de acción del botón
+        if runLeaderboardMenu.action == "back" and backButton.is_ready():
+            runLeaderboardMenu.action = None
+            return 1
 
-    # Actualiza la pantalla
-    pygame.display.flip()
+        # Actualiza la pantalla
+        pygame.display.flip()
 
-    return 3
+        return 3
