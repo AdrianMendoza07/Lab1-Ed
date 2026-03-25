@@ -11,7 +11,8 @@ def runUsersMenu(screen, events, bg):
     
     runUsersMenu.profiles = repo.get_all_profiles()
     
-    
+    if not hasattr(runUsersMenu, "userButtons"):
+        runUsersMenu.userButtons = []
     
     if not hasattr(runUsersMenu, "initialized"):
         runUsersMenu.initialized = True
@@ -41,9 +42,14 @@ def runUsersMenu(screen, events, bg):
         runUsersMenu.last_profiles = []
 
         
-    #Ciclo para botones de Usarios
+    # reconstruir botones 
+    if not hasattr(runUsersMenu, "last_profiles_str") or \
+    runUsersMenu.last_profiles_str != str(runUsersMenu.profiles):
+
+        runUsersMenu.userButtons = []
+
         for i, profile in enumerate(runUsersMenu.profiles):
-            text = f"{profile['name']}  |  {profile['score']} pts"
+            text = f"{profile['name']}  |  {profile['max_score']} pts"
 
             btn = Button(
                 text,
@@ -52,7 +58,10 @@ def runUsersMenu(screen, events, bg):
                 (WIDTH // 2, runUsersMenu.start_y + i * runUsersMenu.spacing),
                 runUsersMenu.button_font
             )
-            runUsersMenu.userButtons.append((btn, profile))    
+
+            runUsersMenu.userButtons.append((btn, profile))
+
+    runUsersMenu.last_profiles_str = str(runUsersMenu.profiles)
 
     backButton = runUsersMenu.backButton
     newUserButton = runUsersMenu.newUserButton
@@ -74,13 +83,15 @@ def runUsersMenu(screen, events, bg):
             runUsersMenu.action = "newUser"    
         for btn, profile in runUsersMenu.userButtons:
             if btn.handle_event(event):
-                runUsersMenu.selected_user = profile     
+                runUsersMenu.selected_user = profile
+                print("Usuario seleccionado:", profile)     
         if event.type == pygame.MOUSEWHEEL:
             runUsersMenu.scroll_offset -= event.y * 20  # speed
             # clamp
             runUsersMenu.scroll_offset = max(0, min(runUsersMenu.scroll_offset, max_offset))     
         if newGameButton.handle_event(event):
-            runUsersMenu.action = "newGame"
+            if runUsersMenu.selected_user is not None:
+                runUsersMenu.action = "newGame"
             
     mouse_pos = pygame.mouse.get_pos()
 
@@ -127,16 +138,17 @@ def runUsersMenu(screen, events, bg):
     # Cambio de estado (para delay entre click y cambio)
     if runUsersMenu.action == "newGame" and newGameButton.is_ready():
         runUsersMenu.action = None
-        return 6
+        return 6, runUsersMenu.selected_user
     
     if runUsersMenu.action == "newUser" and newUserButton.is_ready():
         runUsersMenu.action = None
         return 5
 
     if runUsersMenu.action == "back" and backButton.is_ready():
+        runUsersMenu.action = None
         return 1
 
-    
+    runUsersMenu.last_profiles = runUsersMenu.profiles.copy()
     
     # Actualizar 
     pygame.display.flip()

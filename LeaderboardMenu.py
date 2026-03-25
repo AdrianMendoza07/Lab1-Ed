@@ -39,7 +39,7 @@ def runLeaderboardMenu(screen, events, bg):
         # Obtiene todos los perfiles
         leaderboard = repo.get_all_profiles()
         # Ordena los perfiles por puntaje (de mayor a menor)
-        leaderboard = sorted(leaderboard, key=lambda x: x["score"], reverse=True)
+        leaderboard = sorted(leaderboard, key=lambda x: x["max_score"], reverse=True)
     except Exception as e:
         # Manejo de errores en caso de fallo al obtener datos
         print("Error leaderboard:", e)
@@ -56,7 +56,6 @@ def runLeaderboardMenu(screen, events, bg):
 
     # Actualiza el estado del botón según la posición del mouse
     mouse_pos = pygame.mouse.get_pos()
-    backButton.update(mouse_pos)
 
     # Dibuja el fondo
     screen.blit(bg, (0, 0))
@@ -75,7 +74,7 @@ def runLeaderboardMenu(screen, events, bg):
 
     # Dimensiones y posición de la tabla
     table_width = 600
-    table_height = 400
+    table_height = 700
     table_x = WIDTH//2 - table_width//2
     table_y = 160
 
@@ -166,15 +165,17 @@ def runLeaderboardMenu(screen, events, bg):
         y += 40
         posicion += 1
 
-    # Dibuja el botón "Volver"
-    backButton.draw(screen)
+        backButton.update(mouse_pos)
 
-    # Control de acción del botón
-    if runLeaderboardMenu.action == "back" and backButton.is_ready():
-        runLeaderboardMenu.action = None
-        return 1
+        # Dibuja el botón "Volver"
+        backButton.draw(screen)
 
-    # Actualiza la pantalla
-    pygame.display.flip()
+        # Control de acción del botón
+        if runLeaderboardMenu.action == "back" and backButton.is_ready():
+            runLeaderboardMenu.action = None
+            return 1
 
-    return 3
+        # Actualiza la pantalla
+        pygame.display.flip()
+
+        return 3

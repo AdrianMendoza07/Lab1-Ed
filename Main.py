@@ -6,13 +6,7 @@ from SettingsMenu import runSettingsMenu
 from Repositories.settings_repository import get_settings_data
 from Repositories.Profile_repository import ProfileRepository  # versión JSON
 from LeaderboardMenu import runLeaderboardMenu
-from Game import runGame  
-
-import sys
-import random
-import string
-import time
-
+from Game import runGame
 
 # Inicialización del repositorio de perfiles en JSON
 
@@ -76,6 +70,7 @@ if "--benchmark" in sys.argv:
 # --------------------------------------------------------
 pygame.init()
 settings = get_settings_data()
+selected_user = None
 
 if settings["fullscreen"]:
     screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
@@ -86,6 +81,11 @@ clock = pygame.time.Clock()
 bg_original = pygame.image.load("assets/images/background.jpeg").convert()
 bg = pygame.transform.scale(bg_original, screen.get_size())
 
+bg_original2 = pygame.image.load("assets/images/background2.png").convert()
+bg2 = pygame.transform.scale(bg_original2, screen.get_size())
+
+
+running = True
 
 # Bucle principal del juego y navegación de menús
 
@@ -99,7 +99,9 @@ while running:
             running = False
 
     if state == 1:
-        state = runStartMenu(screen, events, bg)
+        state = runStartMenu(screen, events, bg)   
+    
+    #Menu de Configuracion
     if state == 2:
         result = runSettingsMenu(screen, events, bg, bg_original)
         if isinstance(result, tuple):
@@ -108,16 +110,32 @@ while running:
             state = result
     if state == 3:
         state = runLeaderboardMenu(screen, events, bg)
-    if state == 4:
-        state = runUsersMenu(screen, events, bg)
+        
+    #Menu de creacion de perfil
     if state == 5:
         state = runNewUsersMenu(screen, events, bg)
         if state == 4:
             if hasattr(runUsersMenu, "initialized"):
                 del runUsersMenu.initialized
+    
+    #Menu de seleccion de usuarion antes del juego
+    if state == 4:
+        result = runUsersMenu(screen, events, bg)
+
+        if isinstance(result, tuple):
+            state, selected_user = result
+        else:
+            state = result
+        
+    #Juego            
     if state == 6:
-        state = runGame(screen, events, bg, player1)
-
-    clock.tick(60)
-
+        if selected_user is None:
+            print("ERROR: no hay usuario seleccionado")
+            state = 4
+        else:
+            state = runGame(screen, events, bg2, selected_user)    
+    
+    clock.tick(60)    
+        
+# Finalización de pygame y liberación de recursos
 pygame.quit()

@@ -6,19 +6,25 @@ class Player:
         self.run_frames = []
         for i in range(1, 9):
             img = pygame.image.load(f"assets/images/player/Run{i}.png").convert_alpha()
-            img = pygame.transform.scale(img, (60, 60))
+            img = pygame.transform.scale(img, (120, 120))
             self.run_frames.append(img)
 
         # Cargar sprites de salto
         self.jump_frames = []
         for i in range(1, 4):
             img = pygame.image.load(f"assets/images/player/Jump_{i}.png").convert_alpha()
-            img = pygame.transform.scale(img, (60, 60))
+            img = pygame.transform.scale(img, (120, 120))
             self.jump_frames.append(img)
 
         # Rectángulo
         self.rect = self.run_frames[0].get_rect()
-        self.rect.topleft = (x, y)
+        self.rect.inflate_ip(-20, -20)
+        self.rect.x = max(0, min(self.rect.x, 800 - self.rect.width))
+        self.rect.bottom = y
+        self.vel_y = 0
+        self.on_ground = True
+        self.ground_y = y
+        
 
         # Animación
         self.current_frame = 0
@@ -28,7 +34,7 @@ class Player:
         # Física
         self.vel_y = 0
         self.gravity = 1
-        self.jump_force = -15
+        self.jump_force = -20
         self.on_ground = True
 
         # Estado
@@ -46,8 +52,8 @@ class Player:
         self.rect.y += self.vel_y
 
         ground_y = 300
-        if self.rect.bottom >= ground_y:
-            self.rect.bottom = ground_y
+        if self.rect.bottom >= self.ground_y:
+            self.rect.bottom = self.ground_y
             self.vel_y = 0
             self.on_ground = True
             self.jumping = False
@@ -82,6 +88,14 @@ class Player:
     def update(self, obstacles, enemies):
         if not self.alive:
             return
+
+        keys = pygame.key.get_pressed()
+
+        if keys[pygame.K_LEFT]:
+            self.rect.x -= 5
+        if keys[pygame.K_RIGHT]:
+            self.rect.x += 5
+
         self.apply_gravity()
         self.update_animation()
         self.check_collision(obstacles, enemies)

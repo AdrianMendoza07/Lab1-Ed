@@ -45,12 +45,61 @@ class ProfileRepository:
         }
         position = self.store.add_record(record)
         self.table.insert(player_id, position)
+    
+    def update_max_score(self, player_id, new_score):
+        try:
+            with open("data.log", "r") as file:
+                lines = file.readlines()
+
+            updated_lines = []
+
+            for line in lines:
+                parts = line.strip().split(",")
+
+                if len(parts) < 4:
+                    updated_lines.append(line)
+                    continue
+
+                if parts[0] == player_id:
+                    try:
+                        current_max = int(parts[3])
+                    except:
+                        current_max = 0
+
+                    if new_score > current_max:
+                        print(f"Actualizando {player_id}: {current_max} -> {new_score}")
+                        parts[3] = str(new_score)
+
+                    line = ",".join(parts) + "\n"
+
+                updated_lines.append(line)
+
+            with open("data.log", "w") as file:
+                file.writelines(updated_lines)
+
+        except Exception as e:
+            print("Error actualizando score:", e)
 
     # Obtener perfil por id
     def get_profile(self, player_id):
         position = self.table.search(player_id)
         if position == -1:
             return None
+
+        with open("data.log", "r") as file:
+            file.seek(position)
+            line = file.readline()
+
+        parts = line.strip().split(",")
+
+        return {
+            "id": parts[0],
+            "name": parts[1],
+            "score": int(parts[2]),
+            "max_score": int(parts[3])
+        }
+    
+    def get_next_id(self):
         try:
             return self.store.records[position]
         except IndexError:
